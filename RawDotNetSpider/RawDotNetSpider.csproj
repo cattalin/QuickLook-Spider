@@ -67,6 +67,8 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Managers\OutputManagers\IOutputManager.cs" />
+    <Compile Include="Managers\Utils.cs" />
+    <Compile Include="Managers\UtilsAsync.cs" />
     <Compile Include="Models\WebsiteInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

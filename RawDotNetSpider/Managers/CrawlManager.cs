@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
+using RawDotNetSpider.Managers;
 
 namespace RawDotNetSpider
 {
     public class CrawlManager
     {
-        private Dictionary<string, bool> visitedWebsites;
         private HttpsSanitizerWebClient httpsSanitizerWebClient;
         private int resultsCount = 0;
         private const int MAX_RESULTS = 10;
@@ -21,9 +22,12 @@ namespace RawDotNetSpider
         private FileOutputManager fileOutputManager;
         private ElasticsearchOutputManager esOutputManager;
 
+        private List<Task> crawlTasks = new List<Task>();
+
         public CrawlManager()
         {
-            this.visitedWebsites = new Dictionary<string, bool>();
+            UtilsAsync.visitedWebsites = new Dictionary<string, bool>();
+            Utils.visitedWebsites = new Dictionary<string, bool>();
             this.httpsSanitizerWebClient = new HttpsSanitizerWebClient();
         }
 
@@ -31,14 +35,17 @@ namespace RawDotNetSpider
         {
                 resultsCount = 0;
 
-            using (fileOutputManager = new FileOutputManager(filePath))
-            {
-                //ParseRecursively(urlSeeds);
+            fileOutputManager = new FileOutputManager(filePath);
 
-                //ParseQueue(urlSeeds);
+            //ParseRecursively(urlSeeds);
 
-                ParseWebsiteAsync(urlSeeds.First(), fileOutputManager);
-            }
+            //ParseQueue(urlSeeds);
+
+            ParseWebsiteAsync(urlSeeds.First(), fileOutputManager);
+            //ParseQueue(urlSeeds, fileOutputManager);
+
+            //fileOutputManager.Dispose();
+
 
             //using (esOutputManager = new ElasticsearchOutputManager())
             //{
@@ -46,38 +53,57 @@ namespace RawDotNetSpider
 
             //    //ParseQueue(urlSeeds, esOutputManager);
 
-            //    ParseWebsiteAsync(urlSeeds.First(), esOutputManager);
+            //ParseWebsiteAsync(urlSeeds.First(), esOutputManager);
             //}
 
             Console.ReadLine();
         }
 
-        public async void ParseWebsiteAsync(string url, IOutputManager outputManager)
+        public async Task ParseWebsiteAsync(string url, IOutputManager outputManager)
         {
-            if (!visitedWebsites.Keys.Contains(url))
+            if (!UtilsAsync.visitedWebsites.Keys.Contains(url))//remove all these contains. elasticsearch should handle those
             {
                 try
                 {
                     Console.WriteLine("New website" + url);
 
-                    var htmlDoc = LoadWebsite(url);
+                    var htmlDoc = await UtilsAsync.LoadWebsiteAsync(url);
 
-                    var retrievedInfo = RetrieveWebsiteInfo(url, htmlDoc);
+                    var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(url, htmlDoc);
 
                     outputManager.AddEntry(retrievedInfo);
 
-                    var relatedWebsiteUrls = RetrieveRelatedWebsitesUrls(url, htmlDoc);
+                    var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(url, htmlDoc);
 
                     Console.WriteLine(resultsCount);
 
                     resultsCount++;
-                    foreach (string relatedWebsiteUrl in relatedWebsiteUrls)
+
+
+                    var stopwatch = Stopwatch.StartNew();
+
+
+                    //Parallel.ForEach(relatedWebsiteUrls, relatedWebsiteUrl =>
+                    //{
+                    //    //if (resultsCount < MAX_RESULTS && relatedWebsiteUrls != null && relatedWebsiteUrls.Count() > 0)
+                    //    {
+                    //        //Task.Run(() => ParseWebsiteAsync(relatedWebsiteUrl, outputManager));
+                    //        ParseWebsiteAsync(relatedWebsiteUrl, outputManager); 
+                    //    }
+                    //});
+
+                    foreach (var relatedWebsiteUrl in relatedWebsiteUrls)
                     {
-                        if (resultsCount < MAX_RESULTS && relatedWebsiteUrls != null && relatedWebsiteUrls.Count() > 0)
-                        {
-                            Task.Run(() => ParseWebsiteAsync(relatedWebsiteUrl, outputManager));
-                        }
+                        //Task.Run(() => ParseWebsiteAsync(relatedWebsiteUrl, outputManager));
+                        crawlTasks.Add(Task.Run(() => ParseWebsiteAsync(relatedWebsiteUrl, outputManager)));
                     }
+
+                    stopwatch.Stop();
+
+                    Console.WriteLine("Time Elapsed: " + stopwatch.ElapsedMilliseconds + " for another " +
+                                      relatedWebsiteUrls.Count + " websites.");
+
+
                 }
                 catch (Exception ex)
                 {
@@ -94,15 +120,15 @@ namespace RawDotNetSpider
                 string url = urlList[i++];
                 try
                 {
-                    if (!visitedWebsites.Keys.Contains(url))
+                    if (!Utils.visitedWebsites.Keys.Contains(url))
                     {
-                        var htmlDoc = LoadWebsite(url);
+                        var htmlDoc = Utils.LoadWebsite(url);
 
-                        var retrievedInfo = RetrieveWebsiteInfo(url, htmlDoc);
+                        var retrievedInfo = Utils.RetrieveWebsiteInfo(url, htmlDoc);
 
                         outputManager.AddEntry(retrievedInfo);
 
-                        var relatedWebsiteUrls = RetrieveRelatedWebsitesUrls(url, htmlDoc);
+                        var relatedWebsiteUrls = Utils.RetrieveRelatedWebsitesUrls(url, htmlDoc);
 
                         Console.WriteLine(i);
 
@@ -128,15 +154,15 @@ namespace RawDotNetSpider
             {
                 try
                 {
-                    if (!visitedWebsites.Keys.Contains(url))
+                    if (!Utils.visitedWebsites.Keys.Contains(url))
                     {
-                        var htmlDoc = LoadWebsite(url);
+                        var htmlDoc = Utils.LoadWebsite(url);
 
-                        var retrievedInfo = RetrieveWebsiteInfo(url, htmlDoc);
+                        var retrievedInfo = Utils.RetrieveWebsiteInfo(url, htmlDoc);
 
                         fileOutputManager.AddEntry(retrievedInfo);
 
-                        var relatedWebsiteUrls = RetrieveRelatedWebsitesUrls(url, htmlDoc);
+                        var relatedWebsiteUrls = Utils.RetrieveRelatedWebsitesUrls(url, htmlDoc);
 
                         if (resultsCount < MAX_RESULTS && relatedWebsiteUrls != null && relatedWebsiteUrls.Count() > 0)
                             ParseRecursively(relatedWebsiteUrls, outputManager);
@@ -150,126 +176,6 @@ namespace RawDotNetSpider
             });
         }
 
-        private HtmlDocument LoadWebsite(string url)
-        {
-            visitedWebsites.Add(url, true);
-
-            try
-            {
-                var sanitizedUrl = WebUtility.UrlDecode(url);
-
-
-                //var website = httpsSanitizerWebClient.DownloadString(sanitizedUrl);
-
-                HttpClient httpClient = new HttpClient();
-                var responseResult = httpClient.GetAsync(sanitizedUrl);
-                string website = responseResult.Result.Content.ReadAsStringAsync().Result;
-                
-
-                var htmlDoc = new HtmlDocument();
-                htmlDoc.LoadHtml(website);
-
-                return htmlDoc;
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine("The given Url might be malformated ---> " + url);
-                throw ex;
-            }
-        }
-
-        private WebsiteInfo RetrieveWebsiteInfo(string url, HtmlDocument htmlDoc)
-        {
-            var _title = htmlDoc.DocumentNode.SelectSingleNode("//head//title");
-            var title = _title?.InnerHtml;
-
-
-            var _metas = htmlDoc.DocumentNode.SelectNodes("//meta");
-            var metaDesc = _metas
-                                ?.Where(m => m.HasAttributes && m.Attributes
-                                              .Where(a => a.Name
-                                                            .ToLower()
-                                                            .Equals("name")
-                                                          && a.Value
-                                                            .ToLower()
-                                                            .Equals("description"))
-                                              .Any());
-            var description = metaDesc?.FirstOrDefault()
-                                      ?.Attributes
-                                      ?.Where(a => a.Name
-                                                    .ToLower()
-                                                    .Equals("content"))
-                                      ?.FirstOrDefault()
-                                      ?.Value;
-
-            return new WebsiteInfo
-            {
-                Url = url,
-                Title = title,
-                DescriptionMeta = description,
-                CreateDate = DateTime.Now
-            };
-        }
-
-        private List<string> RetrieveRelatedWebsitesUrls(string url, HtmlDocument htmlDoc)
-        {
-
-            var _refs = htmlDoc.DocumentNode.SelectNodes("//a[@href]");
-            var _hrefs = _refs?.Select(r =>
-            {
-                int hrefAttributeIndex = r.Attributes
-                    .Select(attr => attr.Name)
-                    .ToList()
-                    .IndexOf("href");
-                if (hrefAttributeIndex != null && hrefAttributeIndex != -1)
-                {
-                    return r.Attributes[hrefAttributeIndex].Value;
-                }
-
-                return null;
-
-            });
-
-            //var relatedWebsitesUrls = _hrefs
-            //                 ?.Where(_href => _href.StartsWith("http"))
-            //                 ?.Select(_href => _href);
-            //return relatedWebsitesUrls?.ToList();
-
-
-            Uri baseUrl = new Uri(url);
-
-            List<string> relatedWebsitesUrls = new List<string>();
-
-            _hrefs.ToList().ForEach(_href =>
-            {
-                if (_href.StartsWith("http"))
-                {
-                    relatedWebsitesUrls.Add(_href);
-                }
-                else if (_href.StartsWith("//"))
-                {
-                    relatedWebsitesUrls.Add(baseUrl.Scheme + ":" + _href);
-                }
-                else if (_href.StartsWith("/"))
-                {
-                    relatedWebsitesUrls.Add(baseUrl.Scheme + "://" + baseUrl.Host + _href);
-                }
-                else if (_href.StartsWith("./"))
-                {
-
-                }
-                else if (_href.StartsWith("#"))
-                {
-
-                }
-                else
-                {
-                    
-                }
-
-            });
-
-            return relatedWebsitesUrls?.ToList();
-        }
+        
     }
 }
