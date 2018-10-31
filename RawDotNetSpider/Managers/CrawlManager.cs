@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using HtmlAgilityPack;
 
 namespace RawDotNetSpider
@@ -28,25 +31,65 @@ namespace RawDotNetSpider
         {
                 resultsCount = 0;
 
-            //using (fileOutputManager = new FileOutputManager(filePath))
-            //{
-            //    //ParseRecursively(urlSeeds);
-
-            //    ParseQueue(urlSeeds);
-            //}
-
-            using (esOutputManager = new ElasticsearchOutputManager())
+            using (fileOutputManager = new FileOutputManager(filePath))
             {
                 //ParseRecursively(urlSeeds);
 
-                ParseQueue(urlSeeds, esOutputManager);
+                //ParseQueue(urlSeeds);
+
+                ParseWebsiteAsync(urlSeeds.First(), fileOutputManager);
+            }
+
+            //using (esOutputManager = new ElasticsearchOutputManager())
+            //{
+            //    //ParseRecursively(urlSeeds);
+
+            //    //ParseQueue(urlSeeds, esOutputManager);
+
+            //    ParseWebsiteAsync(urlSeeds.First(), esOutputManager);
+            //}
+
+            Console.ReadLine();
+        }
+
+        public async void ParseWebsiteAsync(string url, IOutputManager outputManager)
+        {
+            if (!visitedWebsites.Keys.Contains(url))
+            {
+                try
+                {
+                    Console.WriteLine("New website" + url);
+
+                    var htmlDoc = LoadWebsite(url);
+
+                    var retrievedInfo = RetrieveWebsiteInfo(url, htmlDoc);
+
+                    outputManager.AddEntry(retrievedInfo);
+
+                    var relatedWebsiteUrls = RetrieveRelatedWebsitesUrls(url, htmlDoc);
+
+                    Console.WriteLine(resultsCount);
+
+                    resultsCount++;
+                    foreach (string relatedWebsiteUrl in relatedWebsiteUrls)
+                    {
+                        if (resultsCount < MAX_RESULTS && relatedWebsiteUrls != null && relatedWebsiteUrls.Count() > 0)
+                        {
+                            Task.Run(() => ParseWebsiteAsync(relatedWebsiteUrl, outputManager));
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Untreated error appeared. Skipping ---> " + url);
+                }
             }
         }
 
         public void ParseQueue(List<string> urlList, IOutputManager outputManager)
         {
             int i = 0;
-            while(i < urlList.Count)
+            while (i < urlList.Count && i <= MAX_RESULTS)
             {
                 string url = urlList[i++];
                 try
@@ -61,13 +104,18 @@ namespace RawDotNetSpider
 
                         var relatedWebsiteUrls = RetrieveRelatedWebsitesUrls(url, htmlDoc);
 
+                        Console.WriteLine(i);
+
                         if (resultsCount < MAX_RESULTS && relatedWebsiteUrls != null && relatedWebsiteUrls.Count() > 0)
+                        {
+                            resultsCount += relatedWebsiteUrls.Count;
                             urlList.AddRange(relatedWebsiteUrls);
-                        
+                        }
+
                     }
                     else Console.WriteLine("Website --> ALREADY VISITED -->" + url + i);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     Console.WriteLine("Untreated error appeared. Skipping ---> " + url);
                 }
@@ -104,13 +152,20 @@ namespace RawDotNetSpider
 
         private HtmlDocument LoadWebsite(string url)
         {
-            resultsCount++;
             visitedWebsites.Add(url, true);
 
             try
             {
                 var sanitizedUrl = WebUtility.UrlDecode(url);
-                var website = httpsSanitizerWebClient.DownloadString(sanitizedUrl);
+
+
+                //var website = httpsSanitizerWebClient.DownloadString(sanitizedUrl);
+
+                HttpClient httpClient = new HttpClient();
+                var responseResult = httpClient.GetAsync(sanitizedUrl);
+                string website = responseResult.Result.Content.ReadAsStringAsync().Result;
+                
+
                 var htmlDoc = new HtmlDocument();
                 htmlDoc.LoadHtml(website);
 
@@ -151,7 +206,8 @@ namespace RawDotNetSpider
             {
                 Url = url,
                 Title = title,
-                DescriptionMeta = description
+                DescriptionMeta = description,
+                CreateDate = DateTime.Now
             };
         }
 

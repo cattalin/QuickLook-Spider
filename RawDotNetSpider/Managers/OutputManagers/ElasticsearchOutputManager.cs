@@ -29,8 +29,11 @@ namespace RawDotNetSpider
 
         public void Dispose()
         {
-            this.Dispose();
-            isDisposed = true;
+            if (!isDisposed)
+            {
+                isDisposed = true;
+                this.Dispose();
+            }
         }
     }
 }

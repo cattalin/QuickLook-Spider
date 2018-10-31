@@ -30,9 +30,12 @@ namespace RawDotNetSpider
 
         public void Dispose()
         {
-            streamWriter.Close();
-            this.Dispose();
-            isDisposed = true;
+            if (!isDisposed)
+            {
+                isDisposed = true;
+                streamWriter.Close();
+                this.Dispose();
+            }
         }
     }
 }
