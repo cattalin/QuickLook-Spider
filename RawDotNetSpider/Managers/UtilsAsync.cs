@@ -19,23 +19,45 @@ namespace RawDotNetSpider.Managers
 
             try
             {
-                //Task.Run(async () =>
-                //{
+//                Task.Run(async () =>
+                {
                     var sanitizedUrl = WebUtility.UrlDecode(url);
-
-                    //var website = httpsSanitizerWebClient.DownloadString(sanitizedUrl);
 
                     HttpClient httpClient = new HttpClient();
                     var responseResult = await httpClient.GetAsync(sanitizedUrl);
                     string website = responseResult.Content.ReadAsStringAsync().Result;
 
+//                    string website = await httpClient.GetStringAsync(sanitizedUrl);
 
                     var htmlDoc = new HtmlDocument();
                     htmlDoc.LoadHtml(website);
 
                     return htmlDoc;
-                //});
+                }
+//                );
 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("The given Url might be malformated ---> " + url);
+                throw ex;
+            }
+        }
+
+        static public async Task<HtmlDocument> LoadWebsite(string url, HttpsSanitizerWebClient webclient)
+        {
+            visitedWebsites.Add(url, true);
+
+            try
+            {
+                var sanitizedUrl = WebUtility.UrlDecode(url);
+
+                var website = webclient.DownloadString(sanitizedUrl);
+
+                var htmlDoc = new HtmlDocument();
+                htmlDoc.LoadHtml(website);
+
+                return htmlDoc;
             }
             catch (Exception ex)
             {

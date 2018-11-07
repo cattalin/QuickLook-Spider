@@ -8,6 +8,7 @@ namespace RawDotNetSpider
 {
     public interface IOutputManager
     {
-        void AddEntry(WebsiteInfo retrievedInfo);
+        void OutputEntry(WebsiteInfo retrievedInfo);
+        Task OutputEntryAsync(WebsiteInfo retrievedInfo);
     }
 }

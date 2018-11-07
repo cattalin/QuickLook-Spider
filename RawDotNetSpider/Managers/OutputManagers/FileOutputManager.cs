@@ -1,21 +1,22 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace RawDotNetSpider
 {
     public class FileOutputManager : IDisposable, IOutputManager
     {
-        private StreamWriter streamWriter;
-        private JsonSerializer serializer;
+        private readonly StreamWriter _streamWriter;
+        private readonly JsonSerializer _serializer;
 
         public FileOutputManager(string filePath)
         {
-            this.streamWriter = new StreamWriter(filePath, true); ;
-            this.serializer = new JsonSerializer();
+            this._streamWriter = new StreamWriter(filePath, true); ;
+            this._serializer = new JsonSerializer();
         }
 
-        public void AddEntry(WebsiteInfo retrievedInfo)
+        public void OutputEntry(WebsiteInfo retrievedInfo)
         {
 
             Console.WriteLine("Website --> " + retrievedInfo.Url);
@@ -23,17 +24,28 @@ namespace RawDotNetSpider
             Console.WriteLine("Desc    --> " + retrievedInfo.DescriptionMeta);
 
 
-            serializer.Serialize(streamWriter, retrievedInfo);
+            _serializer.Serialize(_streamWriter, retrievedInfo);
+        }
+
+        public async Task OutputEntryAsync(WebsiteInfo retrievedInfo)
+        {
+
+            Console.WriteLine("Website --> " + retrievedInfo.Url);
+            Console.WriteLine("Title   --> " + retrievedInfo.Title);
+            Console.WriteLine("Desc    --> " + retrievedInfo.DescriptionMeta);
+
+
+            await Task.Run(() => _serializer.Serialize(_streamWriter, retrievedInfo));
         }
 
         public bool isDisposed = false;
 
         public void Dispose()
         {
-            if (!isDisposed)
+            if (isDisposed == false)
             {
                 isDisposed = true;
-                streamWriter.Close();
+                _streamWriter.Close();
                 this.Dispose();
             }
         }

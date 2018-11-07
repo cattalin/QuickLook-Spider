@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Elasticsearch.Net;
 
 namespace RawDotNetSpider
@@ -16,11 +17,14 @@ namespace RawDotNetSpider
             lowlevelClient = new ElasticLowLevelClient(settings);
         }
 
-        public async void AddEntry(WebsiteInfo retrievedInfo)
+        public void OutputEntry(WebsiteInfo retrievedInfo)
         {
-            //var indexResponse = lowlevelClient.Index<BytesResponse>("website", "website", PostData.Serializable(retrievedInfo));
-            //byte[] responseBytes = indexResponse.Body;
+            var indexResponse = lowlevelClient.Index<BytesResponse>("website", "_doc", PostData.Serializable(retrievedInfo));
+            byte[] responseBytes = indexResponse.Body;
+        }
 
+        public async Task OutputEntryAsync(WebsiteInfo retrievedInfo)
+        {
             var asyncIndexResponse = await lowlevelClient.IndexAsync<StringResponse>("website", "_doc", PostData.Serializable(retrievedInfo));
             string responseString = asyncIndexResponse.Body;
         }

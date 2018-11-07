@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using RawDotNetSpider.Managers;
@@ -14,52 +15,53 @@ namespace RawDotNetSpider
     public class CrawlManager
     {
         private HttpsSanitizerWebClient httpsSanitizerWebClient;
-        private int resultsCount = 0;
-        private const int MAX_RESULTS = 10;
-        string filePath = @"D:\Programare\ANUL 3\Licenta\Results\results" +
-                          DateTimeOffset.UtcNow.ToUnixTimeSeconds() + ".json";
 
-        private FileOutputManager fileOutputManager;
-        private ElasticsearchOutputManager esOutputManager;
+        private IOutputManager outputManager;
 
         private List<Task> crawlTasks = new List<Task>();
 
-        public CrawlManager()
+        public CrawlManager(IOutputManager outputManager)
         {
+            this.outputManager = outputManager;
             UtilsAsync.visitedWebsites = new Dictionary<string, bool>();
             Utils.visitedWebsites = new Dictionary<string, bool>();
             this.httpsSanitizerWebClient = new HttpsSanitizerWebClient();
         }
 
+        public async Task StartCrawlingAsync(List<string> urlSeeds)
+        {
+            ParseWebsiteRecursivelyAsync(urlSeeds.First());
+
+            Console.ReadLine();
+        }
+
         public void StartCrawling(List<string> urlSeeds)
         {
-                resultsCount = 0;
-
-            fileOutputManager = new FileOutputManager(filePath);
-
             //ParseRecursively(urlSeeds);
 
             //ParseQueue(urlSeeds);
 
-            ParseWebsiteAsync(urlSeeds.First(), fileOutputManager);
-            //ParseQueue(urlSeeds, fileOutputManager);
-
-            //fileOutputManager.Dispose();
+            ParseWebsiteRecursivelyAsync(urlSeeds.First());
 
 
             //using (esOutputManager = new ElasticsearchOutputManager())
             //{
-            //    //ParseRecursively(urlSeeds);
-
-            //    //ParseQueue(urlSeeds, esOutputManager);
-
-            //ParseWebsiteAsync(urlSeeds.First(), esOutputManager);
+            //ParseWebsiteRecursivelyAsync(urlSeeds.First(), esOutputManager);
             //}
 
             Console.ReadLine();
         }
 
-        public async Task ParseWebsiteAsync(string url, IOutputManager outputManager)
+        public async Task PeriodicFooAsync(TimeSpan interval, CancellationToken cancellationToken)
+        {
+            while (true)
+            {
+//                await FooAsync();
+                await Task.Delay(interval, cancellationToken);
+            }
+        }
+
+        public async Task ParseWebsiteRecursivelyAsync(string url)
         {
             if (!UtilsAsync.visitedWebsites.Keys.Contains(url))//remove all these contains. elasticsearch should handle those
             {
@@ -67,41 +69,40 @@ namespace RawDotNetSpider
                 {
                     Console.WriteLine("New website" + url);
 
+                    Stopwatch stopwatch;
+
+                    stopwatch = Stopwatch.StartNew();
+
                     var htmlDoc = await UtilsAsync.LoadWebsiteAsync(url);
 
                     var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(url, htmlDoc);
 
-                    outputManager.AddEntry(retrievedInfo);
+                    await outputManager.OutputEntryAsync(retrievedInfo);
 
                     var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(url, htmlDoc);
 
-                    Console.WriteLine(resultsCount);
 
-                    resultsCount++;
+                    
+                    stopwatch.Stop();
 
-
-                    var stopwatch = Stopwatch.StartNew();
-
+                    Console.WriteLine("Time Elapsed: " + stopwatch.ElapsedMilliseconds + " for another " +
+                                      relatedWebsiteUrls.Count + " websites.");
 
                     //Parallel.ForEach(relatedWebsiteUrls, relatedWebsiteUrl =>
                     //{
                     //    //if (resultsCount < MAX_RESULTS && relatedWebsiteUrls != null && relatedWebsiteUrls.Count() > 0)
                     //    {
-                    //        //Task.Run(() => ParseWebsiteAsync(relatedWebsiteUrl, outputManager));
-                    //        ParseWebsiteAsync(relatedWebsiteUrl, outputManager); 
+                    //        //Task.Run(() => ParseWebsiteRecursivelyAsync(relatedWebsiteUrl, outputManager));
+                    //        ParseWebsiteRecursivelyAsync(relatedWebsiteUrl, outputManager); 
                     //    }
                     //});
 
                     foreach (var relatedWebsiteUrl in relatedWebsiteUrls)
                     {
-                        //Task.Run(() => ParseWebsiteAsync(relatedWebsiteUrl, outputManager));
-                        crawlTasks.Add(Task.Run(() => ParseWebsiteAsync(relatedWebsiteUrl, outputManager)));
+                        Task.Run(() => ParseWebsiteRecursivelyAsync(relatedWebsiteUrl));
+//                        crawlTasks.Add(Task.Run(() => ParseWebsiteRecursivelyAsync(relatedWebsiteUrl)));
                     }
 
-                    stopwatch.Stop();
-
-                    Console.WriteLine("Time Elapsed: " + stopwatch.ElapsedMilliseconds + " for another " +
-                                      relatedWebsiteUrls.Count + " websites.");
 
 
                 }
@@ -115,7 +116,7 @@ namespace RawDotNetSpider
         public void ParseQueue(List<string> urlList, IOutputManager outputManager)
         {
             int i = 0;
-            while (i < urlList.Count && i <= MAX_RESULTS)
+            while (i < urlList.Count)
             {
                 string url = urlList[i++];
                 try
@@ -126,15 +127,14 @@ namespace RawDotNetSpider
 
                         var retrievedInfo = Utils.RetrieveWebsiteInfo(url, htmlDoc);
 
-                        outputManager.AddEntry(retrievedInfo);
+                        outputManager.OutputEntry(retrievedInfo);
 
                         var relatedWebsiteUrls = Utils.RetrieveRelatedWebsitesUrls(url, htmlDoc);
 
                         Console.WriteLine(i);
 
-                        if (resultsCount < MAX_RESULTS && relatedWebsiteUrls != null && relatedWebsiteUrls.Count() > 0)
+                        if (relatedWebsiteUrls != null && relatedWebsiteUrls.Count() > 0)
                         {
-                            resultsCount += relatedWebsiteUrls.Count;
                             urlList.AddRange(relatedWebsiteUrls);
                         }
 
@@ -148,7 +148,7 @@ namespace RawDotNetSpider
             }
         }
 
-        public void ParseRecursively(List<string> urlList, IOutputManager outputManager)
+        public void ParseRecursively(List<string> urlList)
         {
             urlList.ForEach(url =>
             {
@@ -160,12 +160,12 @@ namespace RawDotNetSpider
 
                         var retrievedInfo = Utils.RetrieveWebsiteInfo(url, htmlDoc);
 
-                        fileOutputManager.AddEntry(retrievedInfo);
+                        outputManager.OutputEntry(retrievedInfo);
 
                         var relatedWebsiteUrls = Utils.RetrieveRelatedWebsitesUrls(url, htmlDoc);
 
-                        if (resultsCount < MAX_RESULTS && relatedWebsiteUrls != null && relatedWebsiteUrls.Count() > 0)
-                            ParseRecursively(relatedWebsiteUrls, outputManager);
+                        if (relatedWebsiteUrls != null && relatedWebsiteUrls.Count() > 0)
+                            ParseRecursively(relatedWebsiteUrls);
                     }
                     else Console.WriteLine("Website --> ALREADY VISITED -->" + url);
                 }
@@ -176,6 +176,6 @@ namespace RawDotNetSpider
             });
         }
 
-        
+
     }
 }
