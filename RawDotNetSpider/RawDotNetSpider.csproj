@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Managers\CrawlManager.cs" />
+    <Compile Include="Managers\CrawlStatusManager.cs" />
     <Compile Include="Managers\OutputManagers\ElasticsearchOutputManager.cs" />
     <Compile Include="Managers\OutputManagers\FileOutputManager.cs" />
     <Compile Include="Managers\HttpSanitizerWebClient.cs">

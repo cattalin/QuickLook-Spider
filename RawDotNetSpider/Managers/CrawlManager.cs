@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using RawDotNetSpider.Managers;
 
-namespace RawDotNetSpider
+namespace RawDotNetSpider.Managers
 {
     public class CrawlManager
     {
@@ -30,34 +30,80 @@ namespace RawDotNetSpider
 
         public async Task StartCrawlingAsync(List<string> urlSeeds)
         {
-            ParseWebsiteRecursivelyAsync(urlSeeds.First());
-
-            Console.ReadLine();
-        }
-
-        public void StartCrawling(List<string> urlSeeds)
-        {
-            //ParseRecursively(urlSeeds);
-
-            //ParseQueue(urlSeeds);
-
-            ParseWebsiteRecursivelyAsync(urlSeeds.First());
-
-
+            //ParseWebsiteRecursivelyAsync(urlSeeds.First());
             //using (esOutputManager = new ElasticsearchOutputManager())
             //{
             //ParseWebsiteRecursivelyAsync(urlSeeds.First(), esOutputManager);
             //}
 
-            Console.ReadLine();
+            await PeriodicCrawlAsync(new TimeSpan(0, 0, 3), new CancellationToken(false));
         }
 
-        public async Task PeriodicFooAsync(TimeSpan interval, CancellationToken cancellationToken)
+        public async Task PeriodicCrawlAsync(TimeSpan interval, CancellationToken cancellationToken)
         {
             while (true)
             {
-//                await FooAsync();
+                await CrawlBatch(10);
                 await Task.Delay(interval, cancellationToken);
+            }
+        }
+
+        public async Task CrawlBatch(int batchMaxSize)
+        {
+            await Task.Run(() =>
+            {
+                CrawlStatusManager.PendingWebsites.Take(batchMaxSize);
+                Parallel.ForEach(CrawlStatusManager.PendingWebsites.Take(batchMaxSize), pendingUrl =>
+                {
+
+                    ParseWebsiteAsync(pendingUrl);
+
+                });
+            });
+            
+        }
+
+        public async Task ParseWebsiteAsync(string url)
+        {
+            if (!CrawlStatusManager.VisitedWebsites.Keys.Contains(url))//remove all these contains. elasticsearch should handle those
+            {
+                try
+                {
+                    Console.WriteLine("New website" + url);
+
+                    Stopwatch stopwatch;
+
+                    stopwatch = Stopwatch.StartNew();
+
+                    var htmlDoc = await UtilsAsync.LoadWebsiteAsync(url);
+
+                    var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(url, htmlDoc);
+
+                    await outputManager.OutputEntryAsync(retrievedInfo);
+
+                    var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(url, htmlDoc);
+                    
+                    stopwatch.Stop();
+
+                    Console.WriteLine("Time Elapsed: " + stopwatch.ElapsedMilliseconds + " for another " +
+                                      relatedWebsiteUrls.Count + " websites.");
+
+                    await Task.Run(() =>
+                    {
+                        foreach (var relatedWebsiteUrl in relatedWebsiteUrls)
+                        {
+                            if (!CrawlStatusManager.VisitedWebsites.Keys.Contains(relatedWebsiteUrl))
+                            {
+                                CrawlStatusManager.PendingWebsites.Add(relatedWebsiteUrl);
+                            }
+                        }
+                    });
+                    
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Untreated error appeared. Skipping ---> " + url);
+                }
             }
         }
 
@@ -88,22 +134,10 @@ namespace RawDotNetSpider
                     Console.WriteLine("Time Elapsed: " + stopwatch.ElapsedMilliseconds + " for another " +
                                       relatedWebsiteUrls.Count + " websites.");
 
-                    //Parallel.ForEach(relatedWebsiteUrls, relatedWebsiteUrl =>
-                    //{
-                    //    //if (resultsCount < MAX_RESULTS && relatedWebsiteUrls != null && relatedWebsiteUrls.Count() > 0)
-                    //    {
-                    //        //Task.Run(() => ParseWebsiteRecursivelyAsync(relatedWebsiteUrl, outputManager));
-                    //        ParseWebsiteRecursivelyAsync(relatedWebsiteUrl, outputManager); 
-                    //    }
-                    //});
-
                     foreach (var relatedWebsiteUrl in relatedWebsiteUrls)
                     {
                         Task.Run(() => ParseWebsiteRecursivelyAsync(relatedWebsiteUrl));
-//                        crawlTasks.Add(Task.Run(() => ParseWebsiteRecursivelyAsync(relatedWebsiteUrl)));
                     }
-
-
 
                 }
                 catch (Exception ex)
