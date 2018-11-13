@@ -20,11 +20,11 @@ namespace RawDotNetSpider.Managers
 
         private List<Task> crawlTasks = new List<Task>();
 
+        private int visitedCount = 0;
+
         public CrawlManager(IOutputManager outputManager)
         {
             this.outputManager = outputManager;
-            UtilsAsync.visitedWebsites = new Dictionary<string, bool>();
-            Utils.visitedWebsites = new Dictionary<string, bool>();
             this.httpsSanitizerWebClient = new HttpsSanitizerWebClient();
         }
 
@@ -36,7 +36,7 @@ namespace RawDotNetSpider.Managers
             //ParseWebsiteRecursivelyAsync(urlSeeds.First(), esOutputManager);
             //}
 
-            await PeriodicCrawlAsync(new TimeSpan(0, 0, 3), new CancellationToken(false));
+            await PeriodicCrawlAsync(new TimeSpan(0, 0, 1), new CancellationToken(false));
         }
 
         public async Task PeriodicCrawlAsync(TimeSpan interval, CancellationToken cancellationToken)
@@ -52,41 +52,49 @@ namespace RawDotNetSpider.Managers
         {
             await Task.Run(() =>
             {
-                CrawlStatusManager.PendingWebsites.Take(batchMaxSize);
-                Parallel.ForEach(CrawlStatusManager.PendingWebsites.Take(batchMaxSize), pendingUrl =>
+                Parallel.ForEach(CrawlStatusManager.PendingWebsites.Skip(visitedCount).Take(batchMaxSize), pendingUrl =>
                 {
-
-                    ParseWebsiteAsync(pendingUrl);
-
+                    if (!CrawlStatusManager.VisitedWebsites.Keys.Contains(pendingUrl))
+                     //remove all these contains. elasticsearch should handle those
+                    {
+                        ParseWebsiteAsync(pendingUrl);
+                    }
+                    else visitedCount++;
                 });
             });
             
         }
 
-        public async Task ParseWebsiteAsync(string url)
+        public void MarkAsVisited(string url)
         {
-            if (!CrawlStatusManager.VisitedWebsites.Keys.Contains(url))//remove all these contains. elasticsearch should handle those
+            visitedCount++;
+            CrawlStatusManager.VisitedWebsites.Add(url, true);
+//            CrawlStatusManager.PendingWebsites.Remove(url);
+
+        }
+
+            public async Task ParseWebsiteAsync(string currentUrl)
             {
                 try
                 {
-                    Console.WriteLine("New website" + url);
-
                     Stopwatch stopwatch;
 
                     stopwatch = Stopwatch.StartNew();
 
-                    var htmlDoc = await UtilsAsync.LoadWebsiteAsync(url);
+                    MarkAsVisited(currentUrl);
 
-                    var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(url, htmlDoc);
+                    var htmlDoc = await UtilsAsync.LoadWebsiteAsync(currentUrl);
 
-                    await outputManager.OutputEntryAsync(retrievedInfo);
+                    var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(currentUrl, htmlDoc);
 
-                    var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(url, htmlDoc);
-                    
+                    outputManager.OutputEntryAsync(retrievedInfo);
+
+                    var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
+
                     stopwatch.Stop();
 
-                    Console.WriteLine("Time Elapsed: " + stopwatch.ElapsedMilliseconds + " for another " +
-                                      relatedWebsiteUrls.Count + " websites.");
+                    Console.WriteLine(
+                        $@"Time Elapsed: {stopwatch.ElapsedMilliseconds} for crawling {currentUrl} with another {relatedWebsiteUrls.Count} referenced websites.");
 
                     await Task.Run(() =>
                     {
@@ -98,41 +106,42 @@ namespace RawDotNetSpider.Managers
                             }
                         }
                     });
-                    
+
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Untreated error appeared. Skipping ---> " + url);
+                    Console.WriteLine("Untreated error appeared. Skipping ---> " + currentUrl);
                 }
-            }
-        }
 
-        public async Task ParseWebsiteRecursivelyAsync(string url)
+            }
+
+            public async Task ParseWebsiteRecursivelyAsync(string currentUrl)
         {
-            if (!UtilsAsync.visitedWebsites.Keys.Contains(url))//remove all these contains. elasticsearch should handle those
+            if (!CrawlStatusManager.VisitedWebsites.Keys.Contains(currentUrl))//remove all these contains. elasticsearch should handle those
             {
                 try
                 {
-                    Console.WriteLine("New website" + url);
+                    Console.WriteLine("New website" + currentUrl);
 
                     Stopwatch stopwatch;
 
                     stopwatch = Stopwatch.StartNew();
 
-                    var htmlDoc = await UtilsAsync.LoadWebsiteAsync(url);
+                    MarkAsVisited(currentUrl);
 
-                    var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(url, htmlDoc);
+                    var htmlDoc = await UtilsAsync.LoadWebsiteAsync(currentUrl);
+
+                    var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(currentUrl, htmlDoc);
 
                     await outputManager.OutputEntryAsync(retrievedInfo);
 
-                    var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(url, htmlDoc);
+                    var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
 
 
                     
                     stopwatch.Stop();
 
-                    Console.WriteLine("Time Elapsed: " + stopwatch.ElapsedMilliseconds + " for another " +
-                                      relatedWebsiteUrls.Count + " websites.");
+                    Console.WriteLine($@"Time Elapsed: {stopwatch.ElapsedMilliseconds} for crawling {currentUrl} with another {relatedWebsiteUrls.Count} referenced websites.");
 
                     foreach (var relatedWebsiteUrl in relatedWebsiteUrls)
                     {
@@ -142,7 +151,7 @@ namespace RawDotNetSpider.Managers
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Untreated error appeared. Skipping ---> " + url);
+                    Console.WriteLine("Untreated error appeared. Skipping ---> " + currentUrl);
                 }
             }
         }
@@ -155,8 +164,11 @@ namespace RawDotNetSpider.Managers
                 string url = urlList[i++];
                 try
                 {
-                    if (!Utils.visitedWebsites.Keys.Contains(url))
+                    if (!CrawlStatusManager.VisitedWebsites.Keys.Contains(url))
                     {
+
+                        MarkAsVisited(url);
+
                         var htmlDoc = Utils.LoadWebsite(url);
 
                         var retrievedInfo = Utils.RetrieveWebsiteInfo(url, htmlDoc);
@@ -188,8 +200,11 @@ namespace RawDotNetSpider.Managers
             {
                 try
                 {
-                    if (!Utils.visitedWebsites.Keys.Contains(url))
+                    if (!CrawlStatusManager.VisitedWebsites.Keys.Contains(url))
                     {
+
+                        MarkAsVisited(url);
+
                         var htmlDoc = Utils.LoadWebsite(url);
 
                         var retrievedInfo = Utils.RetrieveWebsiteInfo(url, htmlDoc);
@@ -209,7 +224,5 @@ namespace RawDotNetSpider.Managers
                 }
             });
         }
-
-
     }
 }

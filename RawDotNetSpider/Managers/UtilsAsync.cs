@@ -11,12 +11,8 @@ namespace RawDotNetSpider.Managers
 {
     static class UtilsAsync
     {
-        public static Dictionary<string, bool> visitedWebsites;
-
         static public async Task<HtmlDocument> LoadWebsiteAsync(string url)
         {
-            visitedWebsites.Add(url, true);
-
             try
             {
 //                Task.Run(async () =>
@@ -46,8 +42,6 @@ namespace RawDotNetSpider.Managers
 
         static public async Task<HtmlDocument> LoadWebsite(string url, HttpsSanitizerWebClient webclient)
         {
-            visitedWebsites.Add(url, true);
-
             try
             {
                 var sanitizedUrl = WebUtility.UrlDecode(url);

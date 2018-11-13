@@ -10,12 +10,8 @@ namespace RawDotNetSpider.Managers
 {
     static class Utils
     {
-        public static Dictionary<string, bool> visitedWebsites;
-
         static public HtmlDocument LoadWebsite(string url)
         {
-            visitedWebsites.Add(url, true);
-
             try
             {
                 var sanitizedUrl = WebUtility.UrlDecode(url);
