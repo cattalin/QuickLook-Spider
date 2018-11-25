@@ -55,67 +55,66 @@ namespace RawDotNetSpider.Managers
                 Parallel.ForEach(CrawlStatusManager.PendingWebsites.Skip(visitedCount).Take(batchMaxSize), pendingUrl =>
                 {
                     if (!CrawlStatusManager.VisitedWebsites.Keys.Contains(pendingUrl))
-                     //remove all these contains. elasticsearch should handle those
                     {
                         ParseWebsiteAsync(pendingUrl);
                     }
                     else visitedCount++;
                 });
             });
-            
+
         }
 
         public void MarkAsVisited(string url)
         {
             visitedCount++;
             CrawlStatusManager.VisitedWebsites.Add(url, true);
-//            CrawlStatusManager.PendingWebsites.Remove(url);
+            //            CrawlStatusManager.PendingWebsites.Remove(url);
 
         }
 
-            public async Task ParseWebsiteAsync(string currentUrl)
+        public async Task ParseWebsiteAsync(string currentUrl)
+        {
+            try
             {
-                try
+                Stopwatch stopwatch;
+
+                stopwatch = Stopwatch.StartNew();
+
+                MarkAsVisited(currentUrl);
+
+                var htmlDoc = await UtilsAsync.LoadWebsiteAsync(currentUrl);
+
+                var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(currentUrl, htmlDoc);
+
+                outputManager.OutputEntryAsync(retrievedInfo);
+
+                var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
+
+                stopwatch.Stop();
+
+                Console.WriteLine(
+                    $@"Time Elapsed: {stopwatch.ElapsedMilliseconds} for crawling {currentUrl} with another {relatedWebsiteUrls.Count} referenced websites.");
+
+                await Task.Run(() =>
                 {
-                    Stopwatch stopwatch;
-
-                    stopwatch = Stopwatch.StartNew();
-
-                    MarkAsVisited(currentUrl);
-
-                    var htmlDoc = await UtilsAsync.LoadWebsiteAsync(currentUrl);
-
-                    var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(currentUrl, htmlDoc);
-
-                    outputManager.OutputEntryAsync(retrievedInfo);
-
-                    var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
-
-                    stopwatch.Stop();
-
-                    Console.WriteLine(
-                        $@"Time Elapsed: {stopwatch.ElapsedMilliseconds} for crawling {currentUrl} with another {relatedWebsiteUrls.Count} referenced websites.");
-
-                    await Task.Run(() =>
+                    foreach (var relatedWebsiteUrl in relatedWebsiteUrls)
                     {
-                        foreach (var relatedWebsiteUrl in relatedWebsiteUrls)
+                        if (!CrawlStatusManager.VisitedWebsites.Keys.Contains(relatedWebsiteUrl))
                         {
-                            if (!CrawlStatusManager.VisitedWebsites.Keys.Contains(relatedWebsiteUrl))
-                            {
-                                CrawlStatusManager.PendingWebsites.Add(relatedWebsiteUrl);
-                            }
+                            CrawlStatusManager.PendingWebsites.Add(relatedWebsiteUrl);
                         }
-                    });
-
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Untreated error appeared. Skipping ---> " + currentUrl);
-                }
+                    }
+                });
 
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Untreated error appeared. Skipping ---> " + currentUrl);
+            }
 
-            public async Task ParseWebsiteRecursivelyAsync(string currentUrl)
+        }
+
+        public async Task ParseWebsiteRecursivelyAsync(string currentUrl)
         {
             if (!CrawlStatusManager.VisitedWebsites.Keys.Contains(currentUrl))//remove all these contains. elasticsearch should handle those
             {
@@ -138,7 +137,7 @@ namespace RawDotNetSpider.Managers
                     var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
 
 
-                    
+
                     stopwatch.Stop();
 
                     Console.WriteLine($@"Time Elapsed: {stopwatch.ElapsedMilliseconds} for crawling {currentUrl} with another {relatedWebsiteUrls.Count} referenced websites.");

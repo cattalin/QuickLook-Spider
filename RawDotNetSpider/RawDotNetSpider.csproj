@@ -62,15 +62,16 @@
   <ItemGroup>
     <Compile Include="Managers\CrawlManager.cs" />
     <Compile Include="Managers\CrawlStatusManager.cs" />
-    <Compile Include="Managers\OutputManagers\ElasticsearchOutputManager.cs" />
-    <Compile Include="Managers\OutputManagers\FileOutputManager.cs" />
+    <Compile Include="OutputManagers\ElasticsearchOutputManager.cs" />
+    <Compile Include="OutputManagers\FileOutputManager.cs" />
     <Compile Include="Managers\HttpSanitizerWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Managers\OutputManagers\IOutputManager.cs" />
+    <Compile Include="OutputManagers\IOutputManager.cs" />
     <Compile Include="Managers\Utils.cs" />
     <Compile Include="Managers\UtilsAsync.cs" />
     <Compile Include="Models\WebsiteInfo.cs" />
+    <Compile Include="OutputManagers\NestClient.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

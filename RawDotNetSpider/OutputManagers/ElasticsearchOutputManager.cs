@@ -23,6 +23,25 @@ namespace RawDotNetSpider
             byte[] responseBytes = indexResponse.Body;
         }
 
+        public void Search()
+        {
+            var searchResponse = lowlevelClient.Search<StringResponse>("website", "_doc", PostData.Serializable(new
+            {
+                from = 0,
+                size = 10,
+                query = new
+                {
+                    wildcard = new
+                    {
+                        Url = "*.com"
+                    }
+                }
+            }));
+
+            var successful = searchResponse.Success;
+            var responseJson = searchResponse.Body;
+        }
+
         public async Task OutputEntryAsync(WebsiteInfo retrievedInfo)
         {
             var asyncIndexResponse = await lowlevelClient.IndexAsync<StringResponse>("website", "_doc", PostData.Serializable(retrievedInfo));
