@@ -22,6 +22,8 @@ namespace Interface.Controllers
                 }
             };
 
+            ViewData["SearchedContent"] = searchedContent;
+
             return View(results);
         }
     }

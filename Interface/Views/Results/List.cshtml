@@ -4,50 +4,36 @@
     ViewData["Title"] = "List";
 }
 
-<h2>List</h2>
+<h2>Search results for @ViewData["SearchedContent"]</h2>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Url)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DescriptionMeta)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreateDate)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Url)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DescriptionMeta)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreateDate)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td>
-        </tr>
+@foreach (var item in Model)
+{
+
+    <div class="row">
+
+        <div class="col-md-4">
+            @Html.DisplayFor(modelItem => item.Title)
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-8">
+            @Html.DisplayFor(modelItem => item.DescriptionMeta)
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-4">
+            @Html.RouteLink(item.Url, null)
+        </div>
+
+        <div class="col-md-4">
+            @Html.DisplayFor(modelItem => item.CreateDate)
+        </div>
+
+    </div>
 }
-    </tbody>
-</table>

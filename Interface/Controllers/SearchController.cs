@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Interface.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Interface.Controllers
@@ -14,9 +15,9 @@ namespace Interface.Controllers
         }
 
         [HttpPost]
-        public IActionResult Search(string searchedContent)
+        public IActionResult Search(SearchContentDTO searchedContent)
         {
-            return RedirectToAction("List", "Results", searchedContent);
+            return RedirectToAction("List", "Results", searchedContent.Input);
         }
     }
 }
