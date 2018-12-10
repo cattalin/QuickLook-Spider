@@ -1,0 +1,32 @@
+﻿@model SearchContentDTO
+
+@{
+    ViewData["Title"] = "Search";
+}
+
+<h2>Search for something</h2>
+
+<form asp-action="Search">
+
+    <div class="row">
+
+        <div class="col-md-6">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div>
+                <input asp-for="Input" class="form-control"/>
+                <span asp-validation-for="Input" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div>
+                <input type="submit" value="Search" class="btn btn-default"/>
+            </div>
+        </div>
+
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
