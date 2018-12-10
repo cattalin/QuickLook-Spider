@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 
-namespace RawDotNetSpider
+namespace Spider
 { 
     public class ElasticsearchOutputManager : IDisposable, IOutputManager
     {

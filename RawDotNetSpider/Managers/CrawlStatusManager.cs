@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RawDotNetSpider.Managers
+namespace Spider.Managers
 {
     public static class CrawlStatusManager
     {

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using RawDotNetSpider.Managers;
-using RawDotNetSpider.OutputManagers;
+using Spider.Managers;
+using Spider.OutputManagers;
 
-namespace RawDotNetSpider
+namespace Spider
 {
     class Program
     {
@@ -26,10 +26,10 @@ namespace RawDotNetSpider
 
 //            ((ElasticsearchOutputManager) outputManager).Search();
 
-//            NestClient client = new NestClient();
-//            client.Search();
+            NestClient client = new NestClient();
+            client.Search();
 
-            crawlManager.StartCrawlingAsync(urlList);
+//            crawlManager.StartCrawlingAsync(urlList);
 
             Console.ReadLine();
         }

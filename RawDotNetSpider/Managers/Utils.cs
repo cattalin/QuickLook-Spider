@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 
-namespace RawDotNetSpider.Managers
+namespace Spider.Managers
 {
     static class Utils
     {

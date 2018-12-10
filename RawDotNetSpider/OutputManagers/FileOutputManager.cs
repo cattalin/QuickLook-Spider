@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace RawDotNetSpider
+namespace Spider
 {
     public class FileOutputManager : IDisposable, IOutputManager
     {

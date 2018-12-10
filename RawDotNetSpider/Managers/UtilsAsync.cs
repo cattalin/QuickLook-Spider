@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 
-namespace RawDotNetSpider.Managers
+namespace Spider.Managers
 {
     static class UtilsAsync
     {

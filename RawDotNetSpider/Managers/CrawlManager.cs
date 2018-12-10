@@ -8,9 +8,9 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
-using RawDotNetSpider.Managers;
+using Spider.Managers;
 
-namespace RawDotNetSpider.Managers
+namespace Spider.Managers
 {
     public class CrawlManager
     {
