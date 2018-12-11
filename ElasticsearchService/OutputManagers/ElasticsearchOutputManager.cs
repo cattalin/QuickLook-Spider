@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
+using Shared.Models;
 
-namespace Spider
+namespace ElasticsearchService.OutputManagers
 { 
     public class ElasticsearchOutputManager : IDisposable, IOutputManager
     {

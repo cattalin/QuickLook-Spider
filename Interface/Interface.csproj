@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RawDotNetSpider\Spider.csproj" />
+    <ProjectReference Include="..\Models\Shared.csproj" />
   </ItemGroup>
 
 </Project>

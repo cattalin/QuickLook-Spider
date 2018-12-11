@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Spider.Managers;
-using Spider.OutputManagers;
+using ElasticsearchService.OutputManagers;
 
 namespace Spider
 {

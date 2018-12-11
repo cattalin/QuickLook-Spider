@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Shared.Models;
 
-namespace Spider.OutputManagers
+namespace ElasticsearchService.OutputManagers
 {
     public class NestClient
     {

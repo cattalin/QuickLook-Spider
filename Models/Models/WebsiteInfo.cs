@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace Spider
+namespace Shared.Models
 {
     public class WebsiteInfo
     {

@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
+using Shared.Models;
 
 namespace Spider.Managers
 {

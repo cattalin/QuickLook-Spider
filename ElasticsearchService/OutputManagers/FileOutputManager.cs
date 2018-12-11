@@ -2,8 +2,9 @@
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Shared.Models;
 
-namespace Spider
+namespace ElasticsearchService.OutputManagers
 {
     public class FileOutputManager : IDisposable, IOutputManager
     {
