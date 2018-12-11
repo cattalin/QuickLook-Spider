@@ -21,7 +21,7 @@ namespace ElasticsearchService.OutputManagers
             client = new ElasticClient(settings);
         }
 
-        public void Search()
+        public List<WebsiteInfo> Search(string searchedContent)
         {
             var searchResponse = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
@@ -31,12 +31,14 @@ namespace ElasticsearchService.OutputManagers
                 .Query(q => q
                     .Wildcard(w => w
                         .Field("Url")
-                        .Value("*.com*")
+                        .Value("*" + searchedContent + "*")
                     )
                 )
             );
 
-            var responses = searchResponse.Hits;
+            var responses = searchResponse.Documents;
+
+            return responses.ToList();
         }
     }
 }

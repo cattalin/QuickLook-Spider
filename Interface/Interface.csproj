@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ElasticsearchService\ElasticsearchService.csproj" />
     <ProjectReference Include="..\Models\Shared.csproj" />
   </ItemGroup>
 

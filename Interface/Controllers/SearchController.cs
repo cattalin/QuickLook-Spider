@@ -17,7 +17,7 @@ namespace Interface.Controllers
         [HttpPost]
         public IActionResult Search(SearchContentDTO searchedContent)
         {
-            return RedirectToAction("List", "Results", searchedContent.Input);
+            return RedirectToAction("List", "Results", new { searchedContent = searchedContent.Input});
         }
     }
 }

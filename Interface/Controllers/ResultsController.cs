@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ElasticsearchService.OutputManagers;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Models;
 
@@ -9,18 +10,11 @@ namespace Interface.Controllers
 {
     public class ResultsController : Controller
     {
+//        [Route("results/list/{searchedContent}")]
         public IActionResult List(string searchedContent)
         {
-            IEnumerable<WebsiteInfo> results = new List<WebsiteInfo>()
-            {
-                new WebsiteInfo()
-                {
-                    CreateDate = DateTime.Now.AddDays(-3),
-                    DescriptionMeta = "hahaha",
-                    Title = "results 1",
-                    Url = "xxx.com"
-                }
-            };
+            NestClient client = new NestClient();
+            var results = client.Search(searchedContent);
 
             ViewData["SearchedContent"] = searchedContent;
 

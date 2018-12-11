@@ -23,13 +23,8 @@ namespace Spider
 //            IOutputManager outputManager = new FileOutputManager(filePath);
 
             CrawlManager crawlManager = new CrawlManager(outputManager);
-
-//            ((ElasticsearchOutputManager) outputManager).Search();
-
-            NestClient client = new NestClient();
-            client.Search();
-
-//            crawlManager.StartCrawlingAsync(urlList);
+            
+            crawlManager.StartCrawlingAsync(urlList);
 
             Console.ReadLine();
         }
