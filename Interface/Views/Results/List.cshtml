@@ -1,8 +1,15 @@
 ﻿@model IEnumerable<Shared.Models.WebsiteInfo>
 
 @{
-    ViewData["Title"] = "List";
+    ViewData["Title"] = "Search results";
 }
+
+
+<div>
+
+    @{ await Html.RenderPartialAsync("_InputSearchPartial", ViewData["SearchedContent"]); }
+
+</div>
 
 <h2>Search results for @ViewData["SearchedContent"]</h2>
 

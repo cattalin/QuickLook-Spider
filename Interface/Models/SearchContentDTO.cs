@@ -8,5 +8,10 @@ namespace Interface.Models
     public class SearchContentDTO
     {
         public string Input { get; set; }
+
+        public override string ToString()
+        {
+            return Input;
+        }
     }
 }
