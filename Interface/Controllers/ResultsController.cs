@@ -14,7 +14,7 @@ namespace Interface.Controllers
         public IActionResult List(string searchedContent)
         {
             NestClient client = new NestClient();
-            var results = client.Search(searchedContent);
+            var results = client.FullTextSearch(searchedContent);
 
             ViewData["SearchedContent"] = searchedContent;
 

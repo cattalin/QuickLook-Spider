@@ -8,11 +8,11 @@ namespace ElasticsearchService
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Search for a content: ");
+            Console.WriteLine("WilcardSearch for a content: ");
             string searchedContent = Console.ReadLine();
 
             NestClient client = new NestClient();
-            var results = client.Search(searchedContent);
+            var results = client.WilcardSearch(searchedContent);
 
             if(results.Count == 0)
                 Console.WriteLine("No results found");

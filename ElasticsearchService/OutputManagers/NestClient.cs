@@ -21,7 +21,7 @@ namespace ElasticsearchService.OutputManagers
             client = new ElasticClient(settings);
         }
 
-        public List<WebsiteInfo> Search(string searchedContent)
+        public List<WebsiteInfo> WilcardSearch(string searchedContent)
         {
             var searchResponse = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
@@ -35,6 +35,29 @@ namespace ElasticsearchService.OutputManagers
                     )
                 )
             );
+
+            var responses = searchResponse.Documents;
+
+            return responses.ToList();
+        }
+
+        public List<WebsiteInfo> FullTextSearch(string searchedContent)
+        {
+            var searchResponse = client.Search<WebsiteInfo>(s => s
+                .AllIndices()
+                .AllTypes()
+                .From(0)
+                .Size(30)
+                .Query(q => q
+                    .MultiMatch(w => w
+                        .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta"))
+                        .Query(searchedContent)
+                        .Fuzziness(Fuzziness.EditDistance(2))
+                    )
+                )
+
+            );
+            
 
             var responses = searchResponse.Documents;
 
