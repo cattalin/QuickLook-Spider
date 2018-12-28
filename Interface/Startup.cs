@@ -55,8 +55,19 @@ namespace Interface
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
-                    name: "SearchResults",
-                    template: "{controller=Search}/{action=Search}/{searchedContent?}");
+                    name: "ShowResults",
+                    template: "search/{searchedContent}",
+                    defaults: new {controller = "Search", action = "Results" });
+
+                routes.MapRoute(
+                    name: "Search",
+                    template: "search/",
+                    defaults: new {controller = "Search", action = "Search" });
+
+                routes.MapRoute(
+                    name: "DefaultsSearch",
+                    template: "",
+                    defaults: new {controller = "Search", action = "Search" });
             });
         }
     }

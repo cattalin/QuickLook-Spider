@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ElasticsearchService.OutputManagers;
 using Interface.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +18,20 @@ namespace Interface.Controllers
         [HttpPost]
         public IActionResult Search(SearchContentDTO searchedContent)
         {
-            return RedirectToAction("List", "Results", new { searchedContent = searchedContent.Input});
+            return RedirectToAction("Results", new { searchedContent = searchedContent.Input});
+        }
+
+        public IActionResult Results(string searchedContent)
+        {
+            ViewData["SearchedContent"] = new SearchContentDTO
+            {
+                Input = searchedContent
+            };
+
+            NestClient client = new NestClient();
+            var results = client.FullTextSearch(searchedContent);
+
+            return View(results);
         }
     }
 }
