@@ -4,14 +4,17 @@
     ViewData["Title"] = "Search";
 }
 
-<div>
+<div class="container body-content">
 
-    <h2>Search for something</h2>
-    @{ await Html.RenderPartialAsync("_InputSearchPartial", Model); }
+    <div>
+
+        <h2>Search for something</h2>
+        @{ await Html.RenderPartialAsync("_InputSearchPartial", Model); }
+
+    </div>
+
+    @section Scripts {
+        @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    }
 
 </div>
-
-
-@section Scripts {
-    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
-}
