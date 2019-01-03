@@ -10,6 +10,8 @@ namespace ElasticsearchService.OutputManagers
         private ConnectionConfiguration settings;
         private ElasticLowLevelClient lowlevelClient;
 
+        private string index = "websites";
+
         public ElasticsearchOutputManager()
         {
             settings = new ConnectionConfiguration(new Uri("http://localhost:9200"))
@@ -20,13 +22,13 @@ namespace ElasticsearchService.OutputManagers
 
         public void OutputEntry(WebsiteInfo retrievedInfo)
         {
-            var indexResponse = lowlevelClient.Index<BytesResponse>("website", "_doc", PostData.Serializable(retrievedInfo));
+            var indexResponse = lowlevelClient.Index<BytesResponse>(index, "_doc", PostData.Serializable(retrievedInfo));
             byte[] responseBytes = indexResponse.Body;
         }
 
         public void Search()
         {
-            var searchResponse = lowlevelClient.Search<StringResponse>("website", "_doc", PostData.Serializable(new
+            var searchResponse = lowlevelClient.Search<StringResponse>(index, "_doc", PostData.Serializable(new
             {
                 from = 0,
                 size = 10,
@@ -45,7 +47,7 @@ namespace ElasticsearchService.OutputManagers
 
         public async Task OutputEntryAsync(WebsiteInfo retrievedInfo)
         {
-            var asyncIndexResponse = await lowlevelClient.IndexAsync<StringResponse>("website", "_doc", PostData.Serializable(retrievedInfo));
+            var asyncIndexResponse = await lowlevelClient.IndexAsync<StringResponse>(index, "_doc", PostData.Serializable(retrievedInfo));
             string responseString = asyncIndexResponse.Body;
         }
 

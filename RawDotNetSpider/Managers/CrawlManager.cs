@@ -20,8 +20,6 @@ namespace Spider.Managers
 
         private List<Task> crawlTasks = new List<Task>();
 
-        private int visitedCount = 0;
-
         public CrawlManager(IOutputManager outputManager)
         {
             this.outputManager = outputManager;
@@ -43,32 +41,24 @@ namespace Spider.Managers
         {
             while (true)
             {
-                await CrawlBatch(10);
+                await CrawlBatch();
                 await Task.Delay(interval, cancellationToken);
             }
         }
 
-        public async Task CrawlBatch(int batchMaxSize)
+        public async Task CrawlBatch()
         {
             await Task.Run(() =>
             {
-                Parallel.ForEach(CrawlStatusManager.PendingWebsites.Skip(visitedCount).Take(batchMaxSize), pendingUrl =>
+                Parallel.ForEach(CrawlStatusManager.TakeNextBatch(), pendingUrl =>
                 {
-                    if (!CrawlStatusManager.VisitedWebsites.Keys.Contains(pendingUrl))
+                    if (!CrawlStatusManager.IsUrlVisitedThisSession(pendingUrl))
                     {
                         ParseWebsiteAsync(pendingUrl);
                     }
-                    else visitedCount++;
+                    else CrawlStatusManager.IncreaseVisitedCount();
                 });
             });
-
-        }
-
-        public void MarkAsVisited(string url)
-        {
-            visitedCount++;
-            CrawlStatusManager.VisitedWebsites.Add(url, true);
-            //            CrawlStatusManager.PendingWebsites.Remove(url);
 
         }
 
@@ -80,13 +70,14 @@ namespace Spider.Managers
 
                 stopwatch = Stopwatch.StartNew();
 
-                MarkAsVisited(currentUrl);
+                CrawlStatusManager.MarkAsVisited(currentUrl);
 
                 var htmlDoc = await UtilsAsync.LoadWebsiteAsync(currentUrl);
 
                 var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(currentUrl, htmlDoc);
 
-                outputManager.OutputEntryAsync(retrievedInfo);
+                if (!CrawlStatusManager.IsWebsiteRecentlyIndexed(currentUrl))
+                    outputManager.OutputEntryAsync(retrievedInfo);
 
                 var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
 
@@ -99,9 +90,9 @@ namespace Spider.Managers
                 {
                     foreach (var relatedWebsiteUrl in relatedWebsiteUrls)
                     {
-                        if (!CrawlStatusManager.VisitedWebsites.Keys.Contains(relatedWebsiteUrl))
+                        if (!CrawlStatusManager.IsUrlVisitedThisSession(relatedWebsiteUrl))
                         {
-                            CrawlStatusManager.PendingWebsites.Add(relatedWebsiteUrl);
+                            CrawlStatusManager.AddPendingWebsite(relatedWebsiteUrl);
                         }
                     }
                 });
@@ -116,7 +107,7 @@ namespace Spider.Managers
 
         public async Task ParseWebsiteRecursivelyAsync(string currentUrl)
         {
-            if (!CrawlStatusManager.VisitedWebsites.Keys.Contains(currentUrl))//remove all these contains. elasticsearch should handle those
+            if (!CrawlStatusManager.IsWebsiteRecentlyIndexed(currentUrl))//remove all these contains. elasticsearch should handle those
             {
                 try
                 {
@@ -126,7 +117,7 @@ namespace Spider.Managers
 
                     stopwatch = Stopwatch.StartNew();
 
-                    MarkAsVisited(currentUrl);
+                    CrawlStatusManager.MarkAsVisited(currentUrl);
 
                     var htmlDoc = await UtilsAsync.LoadWebsiteAsync(currentUrl);
 
@@ -163,10 +154,10 @@ namespace Spider.Managers
                 string url = urlList[i++];
                 try
                 {
-                    if (!CrawlStatusManager.VisitedWebsites.Keys.Contains(url))
+                    if (!CrawlStatusManager.IsWebsiteRecentlyIndexed(url))
                     {
 
-                        MarkAsVisited(url);
+                        CrawlStatusManager.MarkAsVisited(url);
 
                         var htmlDoc = Utils.LoadWebsite(url);
 
@@ -199,10 +190,10 @@ namespace Spider.Managers
             {
                 try
                 {
-                    if (!CrawlStatusManager.VisitedWebsites.Keys.Contains(url))
+                    if (!CrawlStatusManager.IsWebsiteRecentlyIndexed(url))
                     {
 
-                        MarkAsVisited(url);
+                        CrawlStatusManager.MarkAsVisited(url);
 
                         var htmlDoc = Utils.LoadWebsite(url);
 

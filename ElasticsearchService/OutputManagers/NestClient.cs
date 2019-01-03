@@ -13,17 +13,19 @@ namespace ElasticsearchService.OutputManagers
         private ConnectionSettings settings;
         private ElasticClient client;
 
+        private string index = "websites";
+
         public NestClient()
         {
             settings = new ConnectionSettings(new Uri("http://localhost:9200"))
-                .DefaultIndex("website");
+                .DefaultIndex(index);
 
             client = new ElasticClient(settings);
         }
 
         public List<WebsiteInfo> WilcardSearch(string searchedContent)
         {
-            var searchResponse = client.Search<WebsiteInfo>(s => s
+            var searchResult = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
                 .AllTypes()
                 .From(0)
@@ -36,14 +38,14 @@ namespace ElasticsearchService.OutputManagers
                 )
             );
 
-            var responses = searchResponse.Documents;
+            var results = searchResult.Documents;
 
-            return responses.ToList();
+            return results.ToList();
         }
 
         public List<WebsiteInfo> FullTextSearch(string searchedContent)
         {
-            var searchResponse = client.Search<WebsiteInfo>(s => s
+            var searchResult = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
                 .AllTypes()
                 .From(0)
@@ -57,11 +59,32 @@ namespace ElasticsearchService.OutputManagers
                 )
 
             );
-            
 
-            var responses = searchResponse.Documents;
 
-            return responses.ToList();
+            var results = searchResult.Documents;
+
+            return results.ToList();
         }
+
+        public List<WebsiteInfo> GetWebsitesByUrl(string url)
+        {
+            var searchResult = client.Search<WebsiteInfo>(s => s
+                .AllIndices()
+                .AllTypes()
+                .From(0)
+                .Size(30)
+                .Query(q => q
+                    .ConstantScore(w => w
+                        .Filter(f => f
+                            .Term("Url", url))
+                    )
+                )
+            );
+
+            var results = searchResult.Documents;
+
+            return results.ToList();
+        }
+
     }
 }
