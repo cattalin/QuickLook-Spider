@@ -112,11 +112,18 @@ namespace Spider.Managers
                                       ?.FirstOrDefault()
                                       ?.Value;
 
+            var _page = htmlDoc.DocumentNode.SelectSingleNode("//body");
+            var _paragraphs = _page.SelectNodes("//p");
+
+            var paragraphs = _paragraphs
+                ?.Select(p => WebUtility.HtmlDecode(p.InnerText));
+
             return new WebsiteInfo
             {
                 Url = url,
                 Title = title,
                 DescriptionMeta = description,
+                Paragraphs = paragraphs.ToList(),
                 CreateDate = DateTime.Now
             };
         }

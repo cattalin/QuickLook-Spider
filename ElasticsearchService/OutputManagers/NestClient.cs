@@ -52,10 +52,13 @@ namespace ElasticsearchService.OutputManagers
                 .Size(30)
                 .Query(q => q
                     .MultiMatch(w => w
-                        .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta"))
+                        .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
                         .Query(searchedContent)
                         .Fuzziness(Fuzziness.EditDistance(2))
                     )
+                )
+                .Highlight(h => h
+                    .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
                 )
 
             );
