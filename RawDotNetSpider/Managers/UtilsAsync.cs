@@ -16,30 +16,57 @@ namespace Spider.Managers
         {
             try
             {
-//                Task.Run(async () =>
-                {
-                    var sanitizedUrl = WebUtility.UrlDecode(url);
+                var sanitizedUrl = WebUtility.UrlDecode(url);
 
-                    HttpClient httpClient = new HttpClient();
-                    var responseResult = await httpClient.GetAsync(sanitizedUrl);
-                    string website = responseResult.Content.ReadAsStringAsync().Result;
+                HttpClient httpClient = new HttpClient();
+                var responseResult = await httpClient.GetAsync(sanitizedUrl);
 
-//                    string website = await httpClient.GetStringAsync(sanitizedUrl);
+                string res = responseResult.Content.ReadAsStringAsync().Result;
+                var website = WebUtility.HtmlDecode(res);
 
-                    var htmlDoc = new HtmlDocument();
-                    htmlDoc.LoadHtml(website);
+                var htmlDoc = new HtmlDocument();
+                htmlDoc.LoadHtml(website);
 
-                    return htmlDoc;
-                }
-//                );
+                return htmlDoc;
 
             }
             catch (Exception ex)
             {
-                Console.WriteLine("The given Url might be malformated ---> " + url);
+                Console.WriteLine("The given Url might be malformed ---> " + url);
                 throw ex;
             }
         }
+
+        static public HtmlDocument LoadWebsiteAsResponseMessage(string url)
+        {
+            try
+            {
+                var sanitizedUrl = WebUtility.UrlDecode(url);
+
+                using (HttpClient client = new HttpClient())
+                {
+                    using (HttpResponseMessage response = client.GetAsync(url).Result)
+                    {
+                        var byteArray = response.Content.ReadAsByteArrayAsync().Result;
+                        var res = Encoding.ASCII.GetString(byteArray, 0, byteArray.Length);
+
+                        var website = WebUtility.HtmlDecode(res);
+
+                        var htmlDoc = new HtmlDocument();
+                        htmlDoc.LoadHtml(website);
+
+                        return htmlDoc;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("The given Url might be malformed ---> " + url);
+                throw ex;
+            }
+        }
+
+
 
         static public async Task<HtmlDocument> LoadWebsite(string url, HttpsSanitizerWebClient webclient)
         {
@@ -56,7 +83,7 @@ namespace Spider.Managers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("The given Url might be malformated ---> " + url);
+                Console.WriteLine("The given Url might be malformed ---> " + url);
                 throw ex;
             }
         }
