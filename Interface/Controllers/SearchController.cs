@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using ElasticsearchService.OutputManagers;
 using Interface.Models;
@@ -29,9 +30,9 @@ namespace Interface.Controllers
             };
 
             NestClient client = new NestClient();
-            var results = client.FullTextSearch(searchedContent);
+            var result = client.FullTextSearch(searchedContent);
 
-            return View(results);
+            return View(result);
         }
     }
 }

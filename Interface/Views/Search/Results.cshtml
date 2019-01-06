@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Shared.Models.WebsiteInfo>
+﻿@model Nest.ISearchResponse<Shared.Models.WebsiteInfo>
 
 @{
     ViewData["Title"] = "Search results";
@@ -15,7 +15,7 @@
 
     <h2>Search results for @ViewData["SearchedContent"]</h2>
 
-    @foreach (var item in Model)
+    @foreach (var result in Model.Hits)
     {
         <div class="result-card p-2">
 
@@ -23,7 +23,7 @@
 
                 <div class="col-md-6">
                     <h5 class="overflowed-text">
-                        @Html.DisplayFor(modelItem => item.Title)
+                        @Html.DisplayFor(modelItem => result.Source.Title)
                     </h5>
                 </div>
 
@@ -33,7 +33,7 @@
 
                 <div class="col-md-12">
                     <div class="overflowed-text">
-                        @Html.DisplayFor(modelItem => item.DescriptionMeta)
+                        @Html.DisplayFor(modelItem => result.Source.DescriptionMeta)
                     </div>
                 </div>
 
@@ -42,19 +42,30 @@
             <div class="row mb-3">
 
                 <div class="col-md-10">
-                    <a href="@item.Url">
+                    <a href="@result.Source.Url">
                         <div class="overflowed-text">
-                            @item.Url
+                            @result.Source.Url
                         </div>
                     </a>
                 </div>
 
                 <div class="col-md-2">
-                    @* @Html.DisplayFor(modelItem => item.CreateDate) *@
+                    @* @Html.DisplayFor(modelItem => result.Source.CreateDate) *@
                 </div>
 
             </div>
+                
+                @foreach (var highlight in result.Highlights.First().Value.Highlights.ToList())
+                {
+                    
+                    <div class="col-md-12">
 
+                        @Html.Raw(highlight)
+                        
+                    </div>
+
+                }
+            
         </div>
     }
 

@@ -43,7 +43,7 @@ namespace ElasticsearchService.OutputManagers
             return results.ToList();
         }
 
-        public List<WebsiteInfo> FullTextSearch(string searchedContent)
+        public ISearchResponse<WebsiteInfo> FullTextSearch(string searchedContent)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
@@ -54,19 +54,16 @@ namespace ElasticsearchService.OutputManagers
                     .MultiMatch(w => w
                         .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
                         .Query(searchedContent)
-                        .Fuzziness(Fuzziness.EditDistance(2))
+                        .Fuzziness(Fuzziness.EditDistance(1))
                     )
                 )
-                .Highlight(h => h
+                .Highlight(h => h.PreTags("<b>").PostTags("</b>")
                     .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
                 )
 
             );
 
-
-            var results = searchResult.Documents;
-
-            return results.ToList();
+            return searchResult;
         }
 
         public List<WebsiteInfo> GetWebsitesByUrl(string url)
