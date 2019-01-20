@@ -3,4 +3,10 @@
     ViewData["Title"] = "Error";
 }
 
+<div>
+
+    @{ await Html.RenderPartialAsync("_SearchNavbarPartial", ViewData["SearchedContent"]); }
+
+</div>
+
 No results found

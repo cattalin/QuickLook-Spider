@@ -3,10 +3,14 @@
     ViewData["Title"] = "Error";
 }
 
+<div>
+
+    @{ await Html.RenderPartialAsync("_SearchNavbarPartial", ViewData["SearchedContent"]); }
+
+</div>
+
 <h1 class="text-danger">Error.</h1>
 <h2 class="text-danger">An error occurred while processing your request.</h2>
-
-
 
 <p>
     Unhandled Error Appeared. Please contact <strong>Catalin</strong>
