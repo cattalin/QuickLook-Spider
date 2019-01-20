@@ -1,5 +1,13 @@
 ﻿@model SearchContentDTO
 
-<nav class="navbar navbar-light bg-light">
-    @{ await Html.RenderPartialAsync("_SearchInputPartial", Model); }
+<nav class="custom-navbar text-center">
+    
+    <div class="container nav-container">
+        <img class="search-icon" src="~/images/search-logo-png-7.png"/>
+        <div style="width: 500px;">
+            @{ await Html.RenderPartialAsync("_SearchInputPartial", Model); }
+        </div>
+        
+    </div>
+    
 </nav>

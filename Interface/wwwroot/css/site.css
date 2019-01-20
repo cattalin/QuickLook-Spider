@@ -50,7 +50,64 @@ for details on configuring this project to bundle and minify static web assets. 
     overflow: hidden;
 }
 
+.result-card {
+    cursor: pointer;
+    max-width: 800px;
+}
+
 .result-card:hover {
-    border: 1px solid grey;
-    border-radius: 5px;
+    border: 1px solid #eaeaea;
+    /* border-radius: 5px; */
+    
+}
+
+/* Search Page */
+.vertical-center {
+    min-height: 100%; /* Fallback for browsers do NOT support vh unit */
+    min-height: 100vh; /* These two lines are counted as one :-)       */
+    background-color: #f7f7f7;
+    display: flex;
+    align-items: center;
+}
+
+.search-logo {
+    width: 45%;
+}
+
+.search-container {
+    margin-bottom: 15%;
+}
+
+.search-for-somth {
+    color: #237cd3;
+}
+
+/* Search bar on search page */
+.main-search {
+    height: 75px;
+    font-size: 25px;
+}
+
+/* Results navbar */
+.search-icon {
+    width: 60px;
+    height: 60px;
+    margin-top: 10px;
+}
+
+.custom-navbar {
+    border-bottom: 1px solid #e3e1e1;
+    background-color: #f8f8f8;
+}
+
+.nav-container {
+    display: -webkit-inline-box;
+    margin: auto;
+    text-align: center;
+    padding: 15px;
+}
+
+/* Pagination */
+.page-link {
+    border: none;
 }
