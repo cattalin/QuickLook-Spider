@@ -23,13 +23,13 @@ namespace ElasticsearchService.OutputManagers
             client = new ElasticClient(settings);
         }
 
-        public List<WebsiteInfo> WilcardSearch(string searchedContent)
+        public List<WebsiteInfo> WilcardSearch(string searchedContent, Pagination pagination)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
                 .AllTypes()
-                .From(0)
-                .Size(30)
+                .From(pagination.From)
+                .Size(pagination.Take)
                 .Query(q => q
                     .Wildcard(w => w
                         .Field("Url")
@@ -43,13 +43,56 @@ namespace ElasticsearchService.OutputManagers
             return results.ToList();
         }
 
+        public List<WebsiteInfo> WilcardSearch(string searchedContent)
+        {
+            var searchResult = client.Search<WebsiteInfo>(s => s
+                .AllIndices()
+                .AllTypes()
+                .From(0)
+                .Size(15)
+                .Query(q => q
+                    .Wildcard(w => w
+                        .Field("Url")
+                        .Value("*" + searchedContent + "*")
+                    )
+                )
+            );
+
+            var results = searchResult.Documents;
+
+            return results.ToList();
+        }
+
+        public ISearchResponse<WebsiteInfo> FullTextSearch(string searchedContent, Pagination pagination)
+        {
+            var searchResult = client.Search<WebsiteInfo>(s => s
+                .AllIndices()
+                .AllTypes()
+                .From(pagination.From)
+                .Size(pagination.Take)
+                .Query(q => q
+                    .MultiMatch(w => w
+                        .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
+                        .Query(searchedContent)
+                        .Fuzziness(Fuzziness.EditDistance(2))
+                    )
+                )
+                .Highlight(h => h.PreTags("<b>").PostTags("</b>")
+                    .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
+                )
+
+            );
+
+            return searchResult;
+        }
+
         public ISearchResponse<WebsiteInfo> FullTextSearch(string searchedContent)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
                 .AllTypes()
                 .From(0)
-                .Size(30)
+                .Size(15)
                 .Query(q => q
                     .MultiMatch(w => w
                         .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
@@ -66,13 +109,33 @@ namespace ElasticsearchService.OutputManagers
             return searchResult;
         }
 
+        public List<WebsiteInfo> GetWebsitesByUrl(string url, Pagination pagination)
+        {
+            var searchResult = client.Search<WebsiteInfo>(s => s
+                .AllIndices()
+                .AllTypes()
+                .From(pagination.From)
+                .Size(pagination.Take)
+                .Query(q => q
+                    .ConstantScore(w => w
+                        .Filter(f => f
+                            .Term("Url", url))
+                    )
+                )
+            );
+
+            var results = searchResult.Documents;
+
+            return results.ToList();
+        }
+
         public List<WebsiteInfo> GetWebsitesByUrl(string url)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
                 .AllTypes()
                 .From(0)
-                .Size(30)
+                .Size(15)
                 .Query(q => q
                     .ConstantScore(w => w
                         .Filter(f => f

@@ -1,4 +1,4 @@
-﻿@model Nest.ISearchResponse<Shared.Models.WebsiteInfo>
+﻿@model Shared.DTOs.SearchResultDto
 
 @{
     ViewData["Title"] = "Search results";
@@ -13,9 +13,9 @@
 
 <div class="container body-content">
 
-    <h2>Search results for @ViewData["SearchedContent"]</h2>
-    
-    <div> Found @Model.Total results in @Model.Took ms</div>
+    <h2>Search results for @Model.SearchMetadata.SearchedContent</h2>
+
+    <div> Found @Model.SearchMetadata.Total results in @Model.SearchMetadata.Took ms</div>
 
     @foreach (var result in Model.Hits)
     {
@@ -25,7 +25,7 @@
 
                 <div class="col-md-6">
                     <h5 class="overflowed-text">
-                        @Html.DisplayFor(modelItem => result.Source.Title)
+                        @Html.DisplayFor(modelItem => result.Title)
                     </h5>
                 </div>
 
@@ -35,7 +35,7 @@
 
                 <div class="col-md-12">
                     <div class="overflowed-text">
-                        @Html.DisplayFor(modelItem => result.Source.DescriptionMeta)
+                        @Html.DisplayFor(modelItem => result.DescriptionMeta)
                     </div>
                 </div>
 
@@ -44,9 +44,9 @@
             <div class="row mb-3">
 
                 <div class="col-md-10">
-                    <a href="@result.Source.Url">
+                    <a href="@result.Url">
                         <div class="overflowed-text">
-                            @result.Source.Url
+                            @result.Url
                         </div>
                     </a>
                 </div>
@@ -56,21 +56,62 @@
                 </div>
 
             </div>
-                @if (result.Highlights.Count > 0)
+            @if (result.Highlights.Count > 0)
+            {
+                @foreach (var highlight in result.Highlights)
                 {
-                    @foreach (var highlight in result.Highlights?.First().Value.Highlights?.ToList())
-                     {
-                    
-                         <div class="col-md-12">
 
-                             @Html.Raw(highlight)
-                        
-                         </div>
+                    <div class="col-md-12">
 
-                     }
+                        @Html.Raw(highlight)
+
+                    </div>
+
                 }
-            
+            }
+
         </div>
     }
+
+    <nav aria-label="Navigate through search results">
+        <ul class="pagination justify-content-center">
+
+            <li class="page-item @(@Model.Pagination.Page == 1 ? "disabled" : "")">
+                @Html.ActionLink("Previous", "Results",
+                         new {searchedContent = Model.SearchMetadata.SearchedContent, Take = 10, Page = Model.Pagination.Page - 1}, new {@class = "page-link"})
+            </li>
+
+            @if (Model.Pagination.Page > 1)
+            {
+                <li class="page-item">
+                    @Html.ActionLink((Model.Pagination.Page - 1).ToString(), "Results",
+                        new {searchedContent = Model.SearchMetadata.SearchedContent, Take = 10, Page = Model.Pagination.Page - 1}, new {@class = "page-link"})
+                </li>
+            }
+
+            <li class="page-item active">
+                @Html.ActionLink(Model.Pagination.Page.ToString(), "Results",
+                         new {searchedContent = Model.SearchMetadata.SearchedContent, Take = 10, Page = Model.Pagination.Page}, new {@class = "page-link"})
+            </li>
+
+            <li class="page-item">
+                @Html.ActionLink((Model.Pagination.Page + 1).ToString(), "Results",
+                    new {searchedContent = Model.SearchMetadata.SearchedContent, Take = 10, Page = Model.Pagination.Page + 1}, new {@class = "page-link"})
+            </li>
+
+            @if (Model.Pagination.Page == 1)
+            {
+                <li class="page-item">
+                    @Html.ActionLink((Model.Pagination.Page + 2).ToString(), "Results",
+                        new {searchedContent = Model.SearchMetadata.SearchedContent, Take = 10, Page = Model.Pagination.Page + 2}, new {@class = "page-link"})
+                </li>
+            }
+
+            <li class="page-item">
+                @Html.ActionLink("Next", "Results",
+                         new {searchedContent = Model.SearchMetadata.SearchedContent, Take = 10, Page = Model.Pagination.Page + 1}, new {@class = "page-link"})
+            </li>
+        </ul>
+    </nav>
 
 </div>

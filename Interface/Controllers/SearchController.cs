@@ -7,6 +7,8 @@ using ElasticsearchService.OutputManagers;
 using Interface.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shared.DTOs;
+using Shared.Models;
 
 namespace Interface.Controllers
 {
@@ -20,31 +22,57 @@ namespace Interface.Controllers
         [HttpPost]
         public IActionResult Search(SearchContentDTO searchedContent)
         {
-            return RedirectToAction("Results", new { searchedContent = searchedContent.Input});
+            return RedirectToAction("Results", new { searchedContent = searchedContent.Input });
         }
 
-        public IActionResult Results(string searchedContent)
+        public IActionResult Results(string searchedContent, int take, int page)
         {
             ViewData["SearchedContent"] = new SearchContentDTO
             {
                 Input = searchedContent
             };
 
-            NestClient client = new NestClient();
-            var result = client.FullTextSearch(searchedContent);
+            Pagination pagination = CreatePagination(take, page);
 
-            if (result.Hits.Count == 0)
+            NestClient client = new NestClient();
+            var searchResult = client
+                .FullTextSearch(searchedContent, pagination)
+                .ToDto(pagination, searchedContent);
+
+            if (searchResult.Hits.Count == 0)
             {
                 return View("NotFound");
             }
 
-            return View(result);
+            return View(searchResult);
         }
-        
+
         [AllowAnonymous]
         public IActionResult Error()
         {
             return View();
+        }
+
+        private Pagination CreatePagination(int take, int page)
+        {
+            Pagination pagination = new Pagination()
+            {
+                Take = 10,
+                Page = 1,
+                From = 0
+            };
+
+            if (take != 0 && page != 0)
+            {
+                pagination = new Pagination()
+                {
+                    Take = take,
+                    Page = page,
+                    From = take * (page - 1)
+                };
+            }
+
+            return pagination;
         }
     }
 }

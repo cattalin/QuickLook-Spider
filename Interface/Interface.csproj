@@ -5,10 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Elasticsearch.Net" Version="6.4.0" />
+    <PackageReference Include="Elasticsearch.Net" Version="6.4.2" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
-    <PackageReference Include="NEST" Version="6.4.0" />
+    <PackageReference Include="NEST" Version="6.4.2" />
   </ItemGroup>
 
   <ItemGroup>
