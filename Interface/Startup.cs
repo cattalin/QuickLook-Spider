@@ -31,6 +31,11 @@ namespace Interface
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            services.Configure<IISOptions>(options =>
+            {
+                options.ForwardClientCertificate = false;
+            });
+
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
@@ -44,7 +49,7 @@ namespace Interface
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/error");
                 app.UseHsts();
             }
 
@@ -63,6 +68,11 @@ namespace Interface
                     name: "Search",
                     template: "search/",
                     defaults: new {controller = "Search", action = "Search" });
+                
+                routes.MapRoute(
+                    name: "Error",
+                    template: "error/",
+                    defaults: new {controller = "Search", action = "Error" });
 
                 routes.MapRoute(
                     name: "DefaultsSearch",
