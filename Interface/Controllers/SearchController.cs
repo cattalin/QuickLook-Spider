@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using ElasticsearchService.OutputManagers;
 using Interface.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Interface.Controllers
@@ -32,7 +33,18 @@ namespace Interface.Controllers
             NestClient client = new NestClient();
             var result = client.FullTextSearch(searchedContent);
 
+            if (result.Hits.Count == 0)
+            {
+                return View("NotFound");
+            }
+
             return View(result);
+        }
+        
+        [AllowAnonymous]
+        public IActionResult Error()
+        {
+            return View();
         }
     }
 }

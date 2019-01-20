@@ -14,6 +14,8 @@
 <div class="container body-content">
 
     <h2>Search results for @ViewData["SearchedContent"]</h2>
+    
+    <div> Found @Model.Total results in @Model.Took ms</div>
 
     @foreach (var result in Model.Hits)
     {
@@ -54,16 +56,18 @@
                 </div>
 
             </div>
-                
-                @foreach (var highlight in result.Highlights.First().Value.Highlights.ToList())
+                @if (result.Highlights.Count > 0)
                 {
+                    @foreach (var highlight in result.Highlights?.First().Value.Highlights?.ToList())
+                     {
                     
-                    <div class="col-md-12">
+                         <div class="col-md-12">
 
-                        @Html.Raw(highlight)
+                             @Html.Raw(highlight)
                         
-                    </div>
+                         </div>
 
+                     }
                 }
             
         </div>
