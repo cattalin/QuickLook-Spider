@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using ElasticsearchService.OutputManagers;
+using Shared.Interfaces;
 
 namespace Spider.Managers
 {
@@ -29,7 +30,7 @@ namespace Spider.Managers
         public async Task StartCrawlingAsync(List<string> urlSeeds)
         {
             //ParseWebsiteRecursivelyAsync(urlSeeds.First());
-            //using (esOutputManager = new ElasticsearchOutputManager())
+            //using (esOutputManager = new ESWebsitesOutputManager())
             //{
             //ParseWebsiteRecursivelyAsync(urlSeeds.First(), esOutputManager);
             //}

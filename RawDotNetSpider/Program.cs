@@ -20,7 +20,7 @@ namespace Spider
             CrawlStatusManager.Init();
             CrawlStatusManager.AddPendingWebsites(urlList);
 
-            IOutputManager outputManager = new ElasticsearchOutputManager();
+            IOutputManager outputManager = new ESWebsitesOutputManager();
 //            IOutputManager outputManager = new FileOutputManager(filePath);
 
             CrawlManager crawlManager = new CrawlManager(outputManager);
