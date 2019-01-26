@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Spider.Managers;
 using ElasticsearchService.OutputManagers;
+using Shared.Interfaces;
 
 namespace Spider
 {
@@ -20,7 +21,7 @@ namespace Spider
             CrawlStatusManager.Init();
             CrawlStatusManager.AddPendingWebsites(urlList);
 
-            IOutputManager outputManager = new ESWebsitesOutputManager();
+            IOutputManager outputManager = new ESWebsitesInputManager();
 //            IOutputManager outputManager = new FileOutputManager(filePath);
 
             CrawlManager crawlManager = new CrawlManager(outputManager);

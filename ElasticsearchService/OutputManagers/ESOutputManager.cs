@@ -4,18 +4,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Shared;
 using Shared.Models;
 
 namespace ElasticsearchService.OutputManagers
 {
-    public class NestClient
+    public class ESOutputManager
     {
         private ConnectionSettings settings;
         private ElasticClient client;
 
-        private string index = "websites";
+        private string index = Constants.VISITED_WEBSITES_INDEX;
 
-        public NestClient()
+        public ESOutputManager()
         {
             settings = new ConnectionSettings(new Uri("http://localhost:9200"))
                 .DefaultIndex(index);

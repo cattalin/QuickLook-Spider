@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ElasticsearchService.OutputManagers
 {
-    public class ESPendingWebsitesOutputManager : ESWebsitesOutputManager
+    public class ESPendingWebsitesInputManager : ESWebsitesInputManager
     {
-        public ESPendingWebsitesOutputManager()
+        public ESPendingWebsitesInputManager()
         {
             this.index = "pending_websites";
         }

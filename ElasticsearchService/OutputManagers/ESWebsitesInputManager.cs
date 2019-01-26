@@ -7,14 +7,14 @@ using Shared.Interfaces;
 
 namespace ElasticsearchService.OutputManagers
 {
-    public class ESWebsitesOutputManager : IDisposable, IOutputManager
+    public class ESWebsitesInputManager : IDisposable, IOutputManager
     {
         private ConnectionConfiguration settings;
         private ElasticLowLevelClient lowlevelClient;
 
-        protected string index = "websites";
+        protected string index = Constants.VISITED_WEBSITES_INDEX;
 
-        public ESWebsitesOutputManager()
+        public ESWebsitesInputManager()
         {
             settings = new ConnectionConfiguration(new Uri(Constants.ELASTICSEARCH_URL))
                 .RequestTimeout(TimeSpan.FromMinutes(2));

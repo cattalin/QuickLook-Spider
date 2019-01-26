@@ -30,7 +30,7 @@ namespace Spider.Managers
         public async Task StartCrawlingAsync(List<string> urlSeeds)
         {
             //ParseWebsiteRecursivelyAsync(urlSeeds.First());
-            //using (esOutputManager = new ESWebsitesOutputManager())
+            //using (esOutputManager = new ESWebsitesInputManager())
             //{
             //ParseWebsiteRecursivelyAsync(urlSeeds.First(), esOutputManager);
             //}

@@ -11,7 +11,7 @@ namespace Spider.Managers
     {
         public static Dictionary<string, bool> PendingWebsites { get; set; }
         public static Dictionary<string, bool> VisitedWebsites { get; set; }
-        public static NestClient EsClient { get; private set; }
+        public static ESOutputManager EsClient { get; private set; }
 
         public static int visitedCount { get; private set; }
 
@@ -21,12 +21,13 @@ namespace Spider.Managers
         {
             PendingWebsites = new Dictionary<string, bool>();
             VisitedWebsites = new Dictionary<string, bool>();
-            EsClient = new NestClient();
+            EsClient = new ESOutputManager();
         }
 
         public static string GetWebsiteIdIfAlreadyCrawled(string url)
         {
-            return EsClient.GetWebsitesByUrl(url).First().Id;
+            var existingWebsite = EsClient.GetWebsitesByUrl(url);
+            return existingWebsite.Count > 0 ? existingWebsite.First().Id : null;
         }
 
         public static bool IsWebsiteRecentlyIndexed(string url)

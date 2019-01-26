@@ -52,10 +52,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="OutputManagers\ESPendingWebsitesOutputManager.cs" />
-    <Compile Include="OutputManagers\ESWebsitesOutputManager.cs" />
+    <Compile Include="OutputManagers\ESPendingWebsitesInputManager.cs" />
+    <Compile Include="OutputManagers\ESWebsitesInputManager.cs" />
     <Compile Include="OutputManagers\FileOutputManager.cs" />
-    <Compile Include="OutputManagers\NestClient.cs" />
+    <Compile Include="OutputManagers\ESOutputManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
