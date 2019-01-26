@@ -129,7 +129,7 @@ namespace ElasticsearchService.OutputManagers
             return results.ToList();
         }
 
-        public List<WebsiteInfo> GetWebsitesByUrl(string url)
+        public IReadOnlyCollection<IHit<WebsiteInfo>> GetWebsitesByUrl(string url)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
@@ -144,7 +144,7 @@ namespace ElasticsearchService.OutputManagers
                 )
             );
 
-            var results = searchResult.Documents;
+            var results = searchResult.Hits;
 
             return results.ToList();
         }

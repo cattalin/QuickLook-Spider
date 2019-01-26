@@ -39,6 +39,17 @@ namespace ElasticsearchService.OutputManagers
             await Task.Run(() => _serializer.Serialize(_streamWriter, retrievedInfo));
         }
 
+        public async Task UpdateEntryAsync(WebsiteInfo retrievedInfo, string Id)
+        {
+
+            Console.WriteLine("Website --> " + retrievedInfo.Url);
+            Console.WriteLine("Title   --> " + retrievedInfo.Title);
+            Console.WriteLine("Desc    --> " + retrievedInfo.DescriptionMeta);
+
+
+            await Task.Run(() => _serializer.Serialize(_streamWriter, retrievedInfo));
+        }
+
         public bool isDisposed = false;
 
         public void Dispose()

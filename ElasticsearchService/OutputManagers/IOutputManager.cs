@@ -11,5 +11,6 @@ namespace ElasticsearchService.OutputManagers
     {
         void OutputEntry(WebsiteInfo retrievedInfo);
         Task OutputEntryAsync(WebsiteInfo retrievedInfo);
+        Task UpdateEntryAsync(WebsiteInfo retrievedInfo, string Id);
     }
 }

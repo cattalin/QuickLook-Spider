@@ -14,6 +14,8 @@ namespace Shared.Models
 
         public List<string> Paragraphs { get; set; }
 
+        public string FullPageContent { get; set; }
+
         public DateTime CreateDate { get; set; }
 
         public DateTime UpdateDate { get; set; }

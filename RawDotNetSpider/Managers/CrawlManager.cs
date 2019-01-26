@@ -76,8 +76,15 @@ namespace Spider.Managers
 
                 var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(currentUrl, htmlDoc);
 
-                if (!CrawlStatusManager.IsWebsiteRecentlyIndexed(currentUrl))
-                    outputManager.OutputEntryAsync(retrievedInfo);
+                var existingDocId = CrawlStatusManager.GetWebsiteIdIfAlreadyCrawled(currentUrl);
+                if (existingDocId == null)
+                {
+                    await outputManager.OutputEntryAsync(retrievedInfo);
+                }
+                else
+                {
+                    await outputManager.UpdateEntryAsync(retrievedInfo, existingDocId);
+                }
 
                 var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
 

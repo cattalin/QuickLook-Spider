@@ -4,7 +4,7 @@ using Elasticsearch.Net;
 using Shared.Models;
 
 namespace ElasticsearchService.OutputManagers
-{ 
+{
     public class ElasticsearchOutputManager : IDisposable, IOutputManager
     {
         private ConnectionConfiguration settings;
@@ -48,6 +48,12 @@ namespace ElasticsearchService.OutputManagers
         public async Task OutputEntryAsync(WebsiteInfo retrievedInfo)
         {
             var asyncIndexResponse = await lowlevelClient.IndexAsync<StringResponse>(index, "_doc", PostData.Serializable(retrievedInfo));
+            string responseString = asyncIndexResponse.Body;
+        }
+
+        public async Task UpdateEntryAsync(WebsiteInfo retrievedInfo, string Id)
+        {
+            var asyncIndexResponse = lowlevelClient.Update<StringResponse>(index, "_doc", Id, PostData.Serializable(new { doc = retrievedInfo }));
             string responseString = asyncIndexResponse.Body;
         }
 

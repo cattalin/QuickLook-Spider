@@ -24,6 +24,11 @@ namespace Spider.Managers
             EsClient = new NestClient();
         }
 
+        public static string GetWebsiteIdIfAlreadyCrawled(string url)
+        {
+            return EsClient.GetWebsitesByUrl(url).First().Id;
+        }
+
         public static bool IsWebsiteRecentlyIndexed(string url)
         {
             return EsClient.GetWebsitesByUrl(url).Count > 0;
