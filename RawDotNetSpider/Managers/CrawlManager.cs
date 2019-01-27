@@ -17,13 +17,15 @@ namespace Spider.Managers
     {
         private HttpsSanitizerWebClient httpsSanitizerWebClient;
 
-        private IOutputManager outputManager;
+        private ESWebsitesInputManager crawledWebsites;
+        private ESPendingWebsitesInputManager pendingWebsites;
 
         private List<Task> crawlTasks = new List<Task>();
 
-        public CrawlManager(IOutputManager outputManager)
+        public CrawlManager(ESWebsitesInputManager crawledWebsites, ESPendingWebsitesInputManager pendingWebsites)
         {
-            this.outputManager = outputManager;
+            this.crawledWebsites = crawledWebsites;
+            this.pendingWebsites = pendingWebsites;
             this.httpsSanitizerWebClient = new HttpsSanitizerWebClient();
         }
 
@@ -80,11 +82,11 @@ namespace Spider.Managers
                 var existingDocId = CrawlStatusManager.GetWebsiteIdIfAlreadyCrawled(currentUrl);
                 if (existingDocId == null)
                 {
-                    await outputManager.OutputEntryAsync(retrievedInfo);
+                    await crawledWebsites.OutputEntryAsync(retrievedInfo);
                 }
                 else
                 {
-                    await outputManager.UpdateEntryAsync(retrievedInfo, existingDocId);
+                    await crawledWebsites.UpdateEntryAsync(retrievedInfo, existingDocId);
                 }
 
                 var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
@@ -94,16 +96,19 @@ namespace Spider.Managers
                 Console.WriteLine(
                     $@"Time Elapsed: {stopwatch.ElapsedMilliseconds} for crawling {currentUrl} with another {relatedWebsiteUrls.Count} referenced websites.");
 
-                await Task.Run(() =>
-                {
-                    foreach (var relatedWebsiteUrl in relatedWebsiteUrls)
-                    {
-                        if (!CrawlStatusManager.IsUrlVisitedThisSession(relatedWebsiteUrl))
-                        {
-                            CrawlStatusManager.AddPendingWebsite(relatedWebsiteUrl);
-                        }
-                    }
-                });
+
+
+
+//                await Task.Run(() =>
+//                {
+//                    foreach (var relatedWebsiteUrl in relatedWebsiteUrls)
+//                    {
+//                        if (!CrawlStatusManager.IsUrlVisitedThisSession(relatedWebsiteUrl))
+//                        {
+//                            CrawlStatusManager.AddPendingWebsite(relatedWebsiteUrl);
+//                        }
+//                    }
+//                });
 
             }
             catch (Exception ex)
@@ -131,7 +136,7 @@ namespace Spider.Managers
 
                     var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(currentUrl, htmlDoc);
 
-                    await outputManager.OutputEntryAsync(retrievedInfo);
+                    await crawledWebsites.OutputEntryAsync(retrievedInfo);
 
                     var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
 
@@ -154,7 +159,7 @@ namespace Spider.Managers
             }
         }
 
-        public void ParseQueue(List<string> urlList, IOutputManager outputManager)
+        public void ParseQueue(List<string> urlList, ESWebsitesInputManager outputManager)
         {
             int i = 0;
             while (i < urlList.Count)
@@ -207,7 +212,7 @@ namespace Spider.Managers
 
                         var retrievedInfo = Utils.RetrieveWebsiteInfo(url, htmlDoc);
 
-                        outputManager.OutputEntry(retrievedInfo);
+                        crawledWebsites.OutputEntry(retrievedInfo);
 
                         var relatedWebsiteUrls = Utils.RetrieveRelatedWebsitesUrls(url, htmlDoc);
 

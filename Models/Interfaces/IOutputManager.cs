@@ -6,10 +6,10 @@ using Shared.Models;
 
 namespace Shared.Interfaces
 {
-    public interface IOutputManager
+    public interface IOutputManager<T>
     {
-        void OutputEntry(WebsiteInfo retrievedInfo);
-        Task OutputEntryAsync(WebsiteInfo retrievedInfo);
-        Task UpdateEntryAsync(WebsiteInfo retrievedInfo, string Id);
+        void OutputEntry(T retrievedInfo);
+        Task OutputEntryAsync(T retrievedInfo);
+        Task UpdateEntryAsync(T retrievedInfo, string Id);
     }
 }

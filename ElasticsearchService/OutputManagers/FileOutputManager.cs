@@ -7,7 +7,7 @@ using Shared.Models;
 
 namespace ElasticsearchService.OutputManagers
 {
-    public class FileOutputManager : IDisposable, IOutputManager
+    public class FileOutputManager : IDisposable, IOutputManager<WebsiteInfo>
     {
         private readonly StreamWriter _streamWriter;
         private readonly JsonSerializer _serializer;
