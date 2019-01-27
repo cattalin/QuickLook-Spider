@@ -44,6 +44,8 @@ namespace Spider
             };
 
             pendingWebsites.BulkOutputAsync(test);
+            pendingWebsites.GetNextPendingBatchRandom(12);
+            pendingWebsites.GetNextPendingBatchRandomNest(12);
 
 //            CrawlManager crawlManager = new CrawlManager(crawledWebsites, pendingWebsites);
             

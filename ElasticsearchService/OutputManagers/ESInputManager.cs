@@ -11,7 +11,7 @@ namespace ElasticsearchService.OutputManagers
     public class ESInputManager<T> : IDisposable, IOutputManager<T>
     {
         private ConnectionConfiguration settings;
-        private ElasticLowLevelClient lowlevelClient;
+        protected ElasticLowLevelClient lowlevelClient;
 
         protected string index = Constants.VISITED_WEBSITES_INDEX;
 
