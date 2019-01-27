@@ -47,62 +47,49 @@ namespace Spider.Managers
             while (true)
             {
                 await CrawlBatch();
-                await Task.Delay(interval, cancellationToken);
+//                await Task.Delay(interval, cancellationToken);
             }
         }
 
         public async Task CrawlBatch()
         {
-            await Task.Run(() =>
-            {
-                Parallel.ForEach(pendingWebsites.GetNextPendingBatchRandomNest(Constants.BATCH_SIZE), pendingWeb =>
-                    {
-                        ParseWebsiteAsync(pendingWeb.Url);
-                    });
-//                Parallel.ForEach(CrawlStatusManager.TakeNextBatch(), pendingUrl =>
-//                {
-//                    if (!CrawlStatusManager.IsUrlVisitedThisSession(pendingUrl))
-//                    {
-//                        ParseWebsiteAsync(pendingUrl);
-//                    }
-//                    else CrawlStatusManager.IncreaseVisitedCount();
-//                });
-            });
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            Console.WriteLine("STARTED_BATCH");
 
+            //                await Task.Run(() =>
+            //                {
+            //                    Parallel.ForEach(pendingWebsites.GetNextPendingBatchRandomNest(Constants.BATCH_SIZE),
+            //                        pendingWeb => { ParseWebsiteAsync(pendingWeb.Url); });
+            //                });
+
+            List<Task> tasks = new List<Task>();
+            pendingWebsites.GetNextPendingBatchRandomNest(Constants.BATCH_SIZE).ForEach(async pendingWeb =>
+            {
+                tasks.Add(ParseWebsiteAsync(pendingWeb.Url));
+            });
+            
+
+            await Task.WhenAll(tasks);
+
+            Console.WriteLine($"ENDED_BATCH({stopwatch.ElapsedMilliseconds})");
         }
 
         public async Task ParseWebsiteAsync(string currentUrl)
         {
             try
             {
-                Stopwatch stopwatch;
-
-                stopwatch = Stopwatch.StartNew();
-
-                CrawlStatusManager.MarkAsVisited(currentUrl);
+                Stopwatch stopwatch = Stopwatch.StartNew();
 
                 var htmlDoc = await UtilsAsync.LoadWebsiteAsync(currentUrl);
 
                 var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(currentUrl, htmlDoc);
 
-                var existingDocId = CrawlStatusManager.GetWebsiteIdIfAlreadyCrawled(currentUrl);
-                if (existingDocId == null)
-                {
-                    await crawledWebsites.OutputEntryAsync(retrievedInfo);
-                }
-                else
-                {
-                    await crawledWebsites.UpdateEntryAsync(retrievedInfo, existingDocId);
-                }
+                await crawledWebsites.OutputEntryAsync(retrievedInfo, retrievedInfo.Id);
 
                 var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
 
-                stopwatch.Stop();
 
-                Console.WriteLine(
-                    $@"Time Elapsed: {stopwatch.ElapsedMilliseconds} for crawling {currentUrl} with another {relatedWebsiteUrls.Count} referenced websites.");
-
-
+                //todo extract this one
                 var pendingWebsites = new List<PendingWebsite>();
                 relatedWebsiteUrls.ForEach(w =>
                 {
@@ -119,23 +106,16 @@ namespace Spider.Managers
                     return this.pendingWebsites.BulkOutputAsync(pendingWebsites);
                 });
 
-//                await Task.Run(() =>
-//                {
-//                    foreach (var relatedWebsiteUrl in relatedWebsiteUrls)
-//                    {
-//                        if (!CrawlStatusManager.IsUrlVisitedThisSession(relatedWebsiteUrl))
-//                        {
-//                            CrawlStatusManager.AddPendingWebsite(relatedWebsiteUrl);
-//                        }
-//                    }
-//                });
+                stopwatch.Stop();
+
+                Console.WriteLine(
+                    $@"Time Elapsed: {stopwatch.ElapsedMilliseconds} for crawling {currentUrl} with another {relatedWebsiteUrls.Count} referenced websites.");
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Console.WriteLine("Untreated error appeared. Skipping ---> " + currentUrl);
             }
-
         }
 
         public async Task ParseWebsiteRecursivelyAsync(string currentUrl)

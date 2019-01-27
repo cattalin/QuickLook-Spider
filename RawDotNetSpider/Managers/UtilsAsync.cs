@@ -118,15 +118,16 @@ namespace Spider.Managers
             var paragraphs = _paragraphs
                 ?.Select(p => WebUtility.HtmlDecode(p.InnerText));
 
-            var fullPage = _page.InnerText;
+            //            var fullPage = _page.InnerText;
 
             return new WebsiteInfo
             {
+                Id = url,
                 Url = url,
                 Title = title,
                 DescriptionMeta = description,
                 Paragraphs = paragraphs.ToList(),
-                FullPageContent = fullPage,
+//                FullPageContent = fullPage,
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now
             };

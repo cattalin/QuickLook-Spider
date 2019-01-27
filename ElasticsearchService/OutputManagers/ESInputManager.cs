@@ -59,11 +59,11 @@ namespace ElasticsearchService.OutputManagers
                 data.Add(i);
             });
 
-            var indexResponse = lowlevelClient.Bulk<StringResponse>(PostData.MultiJson(data));
+            var indexResponse = await lowlevelClient.BulkAsync<StringResponse>(PostData.MultiJson(data));
             string responseString = indexResponse.Body;
         }
 
-        public async Task UpdateEntry(T retrievedInfo, string Id)
+        public void UpdateEntry(T retrievedInfo, string Id)
         {
             var asyncIndexResponse = lowlevelClient.Update<StringResponse>(index, "_doc", Id, PostData.Serializable(new { doc = retrievedInfo }));
             string responseString = asyncIndexResponse.Body;

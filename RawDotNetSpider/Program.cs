@@ -19,7 +19,7 @@ namespace Spider
 
         static void Main(string[] args)
         {
-            List<string> urlList = new List<string> { "https://en.wikipedia.org/wiki/Stephen_III_of_Moldavia" };
+            List<string> urlList = new List<string> { "https://www.youtube.com/watch?v=e8CLsYzE5wk" };
             CrawlStatusManager.Init();
             CrawlStatusManager.AddPendingWebsites(urlList);
 
