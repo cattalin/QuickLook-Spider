@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ElasticsearchService.OutputManagers;
+using Shared;
 
 namespace Spider.Managers
 {
@@ -14,8 +15,6 @@ namespace Spider.Managers
         public static ESOutputManager EsClient { get; private set; }
 
         public static int visitedCount { get; private set; }
-
-        private const int BATCH_SIZE = 10;
 
         public static void Init()
         {
@@ -62,7 +61,7 @@ namespace Spider.Managers
 
         public static IEnumerable<string> TakeNextBatch()
         {
-            return new List<string>(PendingWebsites.Keys.Take(BATCH_SIZE));
+            return new List<string>(PendingWebsites.Keys.Take(Constants.BATCH_SIZE));
         }
 
         public static void AddPendingWebsite(string url)

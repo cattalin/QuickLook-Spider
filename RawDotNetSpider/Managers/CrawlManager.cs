@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using ElasticsearchService.OutputManagers;
 using Shared.Interfaces;
+using Shared.Models;
+using Shared;
 
 namespace Spider.Managers
 {
@@ -53,14 +55,18 @@ namespace Spider.Managers
         {
             await Task.Run(() =>
             {
-                Parallel.ForEach(CrawlStatusManager.TakeNextBatch(), pendingUrl =>
-                {
-                    if (!CrawlStatusManager.IsUrlVisitedThisSession(pendingUrl))
+                Parallel.ForEach(pendingWebsites.GetNextPendingBatchRandomNest(Constants.BATCH_SIZE), pendingWeb =>
                     {
-                        ParseWebsiteAsync(pendingUrl);
-                    }
-                    else CrawlStatusManager.IncreaseVisitedCount();
-                });
+                        ParseWebsiteAsync(pendingWeb.Url);
+                    });
+//                Parallel.ForEach(CrawlStatusManager.TakeNextBatch(), pendingUrl =>
+//                {
+//                    if (!CrawlStatusManager.IsUrlVisitedThisSession(pendingUrl))
+//                    {
+//                        ParseWebsiteAsync(pendingUrl);
+//                    }
+//                    else CrawlStatusManager.IncreaseVisitedCount();
+//                });
             });
 
         }
@@ -97,7 +103,21 @@ namespace Spider.Managers
                     $@"Time Elapsed: {stopwatch.ElapsedMilliseconds} for crawling {currentUrl} with another {relatedWebsiteUrls.Count} referenced websites.");
 
 
+                var pendingWebsites = new List<PendingWebsite>();
+                relatedWebsiteUrls.ForEach(w =>
+                {
+                    pendingWebsites.Add(new PendingWebsite()
+                    {
+                        CreateDate = DateTime.Now,
+                        Id = w,
+                        Url = w
+                    });
+                });
 
+                await Task.Run(() =>
+                {
+                    return this.pendingWebsites.BulkOutputAsync(pendingWebsites);
+                });
 
 //                await Task.Run(() =>
 //                {

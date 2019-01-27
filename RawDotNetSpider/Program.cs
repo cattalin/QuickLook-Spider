@@ -43,13 +43,13 @@ namespace Spider
                 }
             };
 
-            pendingWebsites.BulkOutputAsync(test);
-            pendingWebsites.GetNextPendingBatchRandom(12);
-            pendingWebsites.GetNextPendingBatchRandomNest(12);
+//            pendingWebsites.BulkOutputAsync(test);
+//            pendingWebsites.GetNextPendingBatchRandom(12);
+//            pendingWebsites.GetNextPendingBatchRandomNest(12);
 
-//            CrawlManager crawlManager = new CrawlManager(crawledWebsites, pendingWebsites);
+            CrawlManager crawlManager = new CrawlManager(crawledWebsites, pendingWebsites);
             
-//            crawlManager.StartCrawlingAsync(urlList);
+            crawlManager.StartCrawlingAsync(urlList);
 
             Console.ReadLine();
         }
