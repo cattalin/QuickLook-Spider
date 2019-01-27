@@ -11,6 +11,6 @@ namespace Shared
         public const string VISITED_WEBSITES_INDEX = "websites";
         public const string PENDING_WEBSITES_INDEX = "pending_websites";
 
-        public const int BATCH_SIZE = 20;
+        public const int BATCH_SIZE = 40;
     }
 }

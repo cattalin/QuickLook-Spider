@@ -11,6 +11,22 @@ namespace Spider.Managers
 {
     static class Utils
     {
+        public static List<PendingWebsite> ConvertUrlsToModelList(List<string> relatedWebsiteUrls)
+        {
+            var pendingWebsites = new List<PendingWebsite>();
+            relatedWebsiteUrls.ForEach(w =>
+            {
+                pendingWebsites.Add(new PendingWebsite()
+                {
+                    CreateDate = DateTime.Now,
+                    Id = w,
+                    Url = w
+                });
+            });
+
+            return pendingWebsites;
+        }
+
         static public HtmlDocument LoadWebsite(string url)
         {
             try

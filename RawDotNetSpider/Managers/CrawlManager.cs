@@ -56,18 +56,18 @@ namespace Spider.Managers
             Stopwatch stopwatch = Stopwatch.StartNew();
             Console.WriteLine("STARTED_BATCH");
 
-            //                await Task.Run(() =>
-            //                {
-            //                    Parallel.ForEach(pendingWebsites.GetNextPendingBatchRandomNest(Constants.BATCH_SIZE),
-            //                        pendingWeb => { ParseWebsiteAsync(pendingWeb.Url); });
-            //                });
+//            await Task.Run(() =>
+//            {
+//                Parallel.ForEach(pendingWebsites.GetNextPendingBatchRandomNest(Constants.BATCH_SIZE),
+//                    pendingWeb => { ParseWebsiteAsync(pendingWeb.Url); });
+//            });
 
             List<Task> tasks = new List<Task>();
             pendingWebsites.GetNextPendingBatchRandomNest(Constants.BATCH_SIZE).ForEach(async pendingWeb =>
             {
                 tasks.Add(ParseWebsiteAsync(pendingWeb.Url));
             });
-            
+
 
             await Task.WhenAll(tasks);
 
@@ -84,27 +84,12 @@ namespace Spider.Managers
 
                 var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(currentUrl, htmlDoc);
 
-                await crawledWebsites.OutputEntryAsync(retrievedInfo, retrievedInfo.Id);
+                await this.crawledWebsites.OutputEntryAsync(retrievedInfo, retrievedInfo.Id);
 
                 var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
+                var pendingWebsites = Utils.ConvertUrlsToModelList(relatedWebsiteUrls);
 
-
-                //todo extract this one
-                var pendingWebsites = new List<PendingWebsite>();
-                relatedWebsiteUrls.ForEach(w =>
-                {
-                    pendingWebsites.Add(new PendingWebsite()
-                    {
-                        CreateDate = DateTime.Now,
-                        Id = w,
-                        Url = w
-                    });
-                });
-
-                await Task.Run(() =>
-                {
-                    return this.pendingWebsites.BulkOutputAsync(pendingWebsites);
-                });
+                await this.pendingWebsites.BulkOutputAsync(pendingWebsites);
 
                 stopwatch.Stop();
 
