@@ -93,6 +93,15 @@ namespace Spider.Managers
             var _title = htmlDoc.DocumentNode.SelectSingleNode("//head//title");
             var title = _title?.InnerHtml;
 
+            var _html = htmlDoc.DocumentNode.SelectSingleNode("//html");
+
+            var _language = _html.HasAttributes
+                            && _html.Attributes.Where(a => a.Name
+                                .ToLower()
+                                .Equals("lang")
+                            ).Any()
+                ? _html.Attributes["lang"].Value
+                : "en";
 
             var _metas = htmlDoc.DocumentNode.SelectNodes("//meta");
             var metaDesc = _metas
@@ -118,7 +127,7 @@ namespace Spider.Managers
             var paragraphs = _paragraphs
                 ?.Select(p => WebUtility.HtmlDecode(p.InnerText));
 
-            //            var fullPage = _page.InnerText;
+            var fullPage = _page.InnerText;
 
             return new WebsiteInfo
             {
@@ -127,7 +136,8 @@ namespace Spider.Managers
                 Title = title,
                 DescriptionMeta = description,
                 Paragraphs = paragraphs.ToList(),
-//                FullPageContent = fullPage,
+                FullPageContent = fullPage,
+                Language = _language,
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now
             };

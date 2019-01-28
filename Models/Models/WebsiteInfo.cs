@@ -18,6 +18,8 @@ namespace Shared.Models
 
         public string FullPageContent { get; set; }
 
+        public string Language { get; set; }
+
         public DateTime CreateDate { get; set; }
 
         public DateTime UpdateDate { get; set; }
