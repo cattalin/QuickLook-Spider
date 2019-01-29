@@ -21,6 +21,31 @@ namespace ElasticsearchService.OutputManagers
         public ESOutputManager()
         {
             settings = new ConnectionSettings(new Uri("http://localhost:9200"))
+                .DefaultFieldNameInferrer(d => { return d.First().ToString().ToUpper() + d.Substring(1); })
+                .EnableDebugMode(response =>
+                {
+                    if (response.RequestBodyInBytes!= null)
+                    {
+                        Console.WriteLine($"Requested " +
+                                          $"{Encoding.UTF8.GetString(response.RequestBodyInBytes)}\n" +
+                                          $"{new string('-', 30)}\n");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Requested without body");
+                    }
+                    if (response.ResponseBodyInBytes!= null)
+                    {
+                        Console.WriteLine($"Status: {response.HttpStatusCode}\n" +
+                                          $"{Encoding.UTF8.GetString(response.ResponseBodyInBytes)}\n" +
+                                          $"{new string('-', 30)}\n");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Status: {response.HttpStatusCode}\n" +
+                                          $"{new string('-', 30)}\n");
+                    }
+                })
                 .DefaultIndex(index);
 
             client = new ElasticClient(settings);
@@ -35,7 +60,7 @@ namespace ElasticsearchService.OutputManagers
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
-                .AllTypes()
+                .Type("_doc")
                 .From(pagination.From)
                 .Size(pagination.Take)
                 .Query(q => q
@@ -71,11 +96,11 @@ namespace ElasticsearchService.OutputManagers
             return results.ToList();
         }
 
-        public ISearchResponse<WebsiteInfo> FullTextSearchtest(string searchedContent, Pagination pagination)
+        public ISearchResponse<WebsiteInfo> FullTextSearch(string searchedContent, Pagination pagination)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .Index(Constants.VISITED_WEBSITES_INDEX)
-                .AllTypes()
+                .Type("_doc")
                 .From(pagination.From)
                 .Size(pagination.Take)
                 .Query(q => q
@@ -84,11 +109,9 @@ namespace ElasticsearchService.OutputManagers
                             m => m.MultiMatch(w => w
                                 .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
                                 .Query(searchedContent)
-                                .Fuzziness(Fuzziness.EditDistance(2))
-                            ))
-                        .Must(
+                                .Fuzziness(Fuzziness.EditDistance(2))),
                             m => m.Term(t => t.Language, "en")
-                        )
+                            )
                     )
                 )
                 .Highlight(h => h.PreTags("<b>").PostTags("</b>")
@@ -99,11 +122,11 @@ namespace ElasticsearchService.OutputManagers
 
             return searchResult;
         }
-        public ISearchResponse<WebsiteInfo> FullTextSearch(string searchedContent, Pagination pagination)
+        public ISearchResponse<WebsiteInfo> FullTextSearchtest(string searchedContent, Pagination pagination)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .Index(Constants.VISITED_WEBSITES_INDEX)
-                .AllTypes()
+                .Type("_doc")
                 .From(pagination.From)
                 .Size(pagination.Take)
                 .Query(q =>
@@ -112,8 +135,8 @@ namespace ElasticsearchService.OutputManagers
                             .Query(searchedContent)
                             .Fuzziness(Fuzziness.EditDistance(2))
                         )
-                    //                        &&
-//                    q.Term(t => t.Language, "en")
+                    &&
+                    q.Term(t => t.Language, "en")
 
                     )
                 .Highlight(h => h.PreTags("<b>").PostTags("</b>")
@@ -131,7 +154,7 @@ namespace ElasticsearchService.OutputManagers
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
-                .AllTypes()
+                .Type("_doc")
                 .From(0)
                 .Size(15)
                 .Query(q => q
@@ -154,7 +177,7 @@ namespace ElasticsearchService.OutputManagers
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
-                .AllTypes()
+                .Type(Constants.VISITED_WEBSITES_INDEX)
                 .From(pagination.From)
                 .Size(pagination.Take)
                 .Query(q => q
@@ -174,7 +197,7 @@ namespace ElasticsearchService.OutputManagers
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
-                .AllTypes()
+                .Type(Constants.VISITED_WEBSITES_INDEX)
                 .From(0)
                 .Size(15)
                 .Query(q => q
