@@ -33,13 +33,8 @@ namespace Spider.Managers
 
         public async Task StartCrawlingAsync(List<string> urlSeeds)
         {
-            //ParseWebsiteRecursivelyAsync(urlSeeds.First());
-            //using (esOutputManager = new ESWebsitesInputManager())
-            //{
-            //ParseWebsiteRecursivelyAsync(urlSeeds.First(), esOutputManager);
-            //}
-
-            await PeriodicCrawlAsync(new TimeSpan(0, 0, 1), new CancellationToken(false));
+            await StartCrawlThreadsAsync();
+//            await PeriodicCrawlAsync(new TimeSpan(0, 0, 1), new CancellationToken(false));
         }
 
         public async Task PeriodicCrawlAsync(TimeSpan interval, CancellationToken cancellationToken)
@@ -70,6 +65,31 @@ namespace Spider.Managers
 
 
             await Task.WhenAll(tasks);
+
+            Console.WriteLine($"ENDED_BATCH({stopwatch.ElapsedMilliseconds})");
+        }
+
+        public async Task StartCrawlThreadsAsync()
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            Console.WriteLine("STARTED_BATCH");
+
+            for(var i = 0; i < Constants.BATCH_SIZE; i++)
+            {
+                Task.Run(async () =>
+                {
+//                    Console.WriteLine($"1");
+                    while (true)
+                    {
+//                        Console.WriteLine($"STARTED_THREAD {i}");
+
+                        var pendingWebsite = pendingWebsites.GetNextPendingBatchRandomNest(1).First();
+                        await ParseWebsiteAsync(pendingWebsite.Url);
+
+//                        Console.WriteLine($"ENDED_THREAD {i}");
+                    }
+                });
+            }
 
             Console.WriteLine($"ENDED_BATCH({stopwatch.ElapsedMilliseconds})");
         }

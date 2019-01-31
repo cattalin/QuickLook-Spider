@@ -14,10 +14,12 @@ namespace ElasticsearchService.OutputManagers
     {
         private ConnectionSettings settings;
         private ElasticClient client;
+        private Random rr;
 
         public ESPendingWebsitesInputManager()
         : base()
         {
+            rr = new Random();
             this.index = Constants.PENDING_WEBSITES_INDEX;
             settings = new ConnectionSettings(new Uri(Constants.ELASTICSEARCH_URL))
                 .DefaultIndex(index)
@@ -67,7 +69,7 @@ namespace ElasticsearchService.OutputManagers
                     .FunctionScore(f => f
                         .Functions(ff => ff
                             .RandomScore(rs => rs
-                                .Seed(DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+                                .Seed(rr.Next())
                             )
                         )
                     )
