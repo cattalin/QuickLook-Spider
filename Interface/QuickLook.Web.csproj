@@ -12,8 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ElasticsearchService\ElasticsearchService.csproj" />
-    <ProjectReference Include="..\Models\Shared.csproj" />
+    <ProjectReference Include="..\ElasticsearchService\QuickLook.ElasticsearchService.csproj" />
+    <ProjectReference Include="..\Models\QuickLook.Shared.csproj" />
   </ItemGroup>
 
 </Project>
