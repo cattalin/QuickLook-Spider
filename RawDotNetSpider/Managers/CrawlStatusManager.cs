@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ElasticsearchService.OutputManagers;
+using Shared;
 
 namespace Spider.Managers
 {
@@ -11,17 +12,21 @@ namespace Spider.Managers
     {
         public static Dictionary<string, bool> PendingWebsites { get; set; }
         public static Dictionary<string, bool> VisitedWebsites { get; set; }
-        public static NestClient EsClient { get; private set; }
+        public static ESOutputManager EsClient { get; private set; }
 
         public static int visitedCount { get; private set; }
-
-        private const int BATCH_SIZE = 10;
 
         public static void Init()
         {
             PendingWebsites = new Dictionary<string, bool>();
             VisitedWebsites = new Dictionary<string, bool>();
-            EsClient = new NestClient();
+            EsClient = new ESOutputManager();
+        }
+
+        public static string GetWebsiteIdIfAlreadyCrawled(string url)
+        {
+            var existingWebsite = EsClient.GetWebsitesByUrl(url);
+            return existingWebsite.Count > 0 ? existingWebsite.First().Id : null;
         }
 
         public static bool IsWebsiteRecentlyIndexed(string url)
@@ -56,7 +61,7 @@ namespace Spider.Managers
 
         public static IEnumerable<string> TakeNextBatch()
         {
-            return new List<string>(PendingWebsites.Keys.Take(BATCH_SIZE));
+            return new List<string>(PendingWebsites.Keys.Take(Constants.BATCH_SIZE));
         }
 
         public static void AddPendingWebsite(string url)

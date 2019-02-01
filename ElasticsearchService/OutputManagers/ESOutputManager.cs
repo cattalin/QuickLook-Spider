@@ -4,30 +4,63 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Elasticsearch.Net;
+using Shared;
 using Shared.Models;
+using System.Diagnostics;
 
 namespace ElasticsearchService.OutputManagers
 {
-    public class NestClient
+    public class ESOutputManager
     {
         private ConnectionSettings settings;
         private ElasticClient client;
 
-        private string index = "websites";
+        private string index = Constants.VISITED_WEBSITES_INDEX;
 
-        public NestClient()
+        public ESOutputManager()
         {
             settings = new ConnectionSettings(new Uri("http://localhost:9200"))
+                .DefaultFieldNameInferrer(d => { return d.First().ToString().ToUpper() + d.Substring(1); })
+                .EnableDebugMode(response =>
+                {
+                    if (response.RequestBodyInBytes!= null)
+                    {
+                        Console.WriteLine($"Requested " +
+                                          $"{Encoding.UTF8.GetString(response.RequestBodyInBytes)}\n" +
+                                          $"{new string('-', 30)}\n");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Requested without body");
+                    }
+                    if (response.ResponseBodyInBytes!= null)
+                    {
+                        Console.WriteLine($"Status: {response.HttpStatusCode}\n" +
+                                          $"{Encoding.UTF8.GetString(response.ResponseBodyInBytes)}\n" +
+                                          $"{new string('-', 30)}\n");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Status: {response.HttpStatusCode}\n" +
+                                          $"{new string('-', 30)}\n");
+                    }
+                })
                 .DefaultIndex(index);
 
             client = new ElasticClient(settings);
+
+//            settings.OnRequestCompleted(call =>
+//            {
+//                Debug.Write(Encoding.UTF8.GetString(call.RequestBodyInBytes));
+//            });
         }
 
         public List<WebsiteInfo> WilcardSearch(string searchedContent, Pagination pagination)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
-                .AllTypes()
+                .Type("_doc")
                 .From(pagination.From)
                 .Size(pagination.Take)
                 .Query(q => q
@@ -66,15 +99,19 @@ namespace ElasticsearchService.OutputManagers
         public ISearchResponse<WebsiteInfo> FullTextSearch(string searchedContent, Pagination pagination)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
-                .AllIndices()
-                .AllTypes()
+                .Index(Constants.VISITED_WEBSITES_INDEX)
+                .Type("_doc")
                 .From(pagination.From)
                 .Size(pagination.Take)
                 .Query(q => q
-                    .MultiMatch(w => w
-                        .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
-                        .Query(searchedContent)
-                        .Fuzziness(Fuzziness.EditDistance(2))
+                    .Bool(b => b
+                        .Must(
+                            m => m.MultiMatch(w => w
+                                .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
+                                .Query(searchedContent)
+                                .Fuzziness(Fuzziness.EditDistance(2))),
+                            m => m.Term(t => t.Language, "en")
+                            )
                     )
                 )
                 .Highlight(h => h.PreTags("<b>").PostTags("</b>")
@@ -85,12 +122,39 @@ namespace ElasticsearchService.OutputManagers
 
             return searchResult;
         }
+        public ISearchResponse<WebsiteInfo> FullTextSearchtest(string searchedContent, Pagination pagination)
+        {
+            var searchResult = client.Search<WebsiteInfo>(s => s
+                .Index(Constants.VISITED_WEBSITES_INDEX)
+                .Type("_doc")
+                .From(pagination.From)
+                .Size(pagination.Take)
+                .Query(q =>
+                    q.MultiMatch(w => w
+                            .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
+                            .Query(searchedContent)
+                            .Fuzziness(Fuzziness.EditDistance(2))
+                        )
+                    &&
+                    q.Term(t => t.Language, "en")
+
+                    )
+                .Highlight(h => h.PreTags("<b>").PostTags("</b>")
+                    .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
+                )
+
+            );
+
+
+
+            return searchResult;
+        }
 
         public ISearchResponse<WebsiteInfo> FullTextSearch(string searchedContent)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
-                .AllTypes()
+                .Type("_doc")
                 .From(0)
                 .Size(15)
                 .Query(q => q
@@ -113,7 +177,7 @@ namespace ElasticsearchService.OutputManagers
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
-                .AllTypes()
+                .Type(Constants.VISITED_WEBSITES_INDEX)
                 .From(pagination.From)
                 .Size(pagination.Take)
                 .Query(q => q
@@ -129,11 +193,11 @@ namespace ElasticsearchService.OutputManagers
             return results.ToList();
         }
 
-        public List<WebsiteInfo> GetWebsitesByUrl(string url)
+        public IReadOnlyCollection<IHit<WebsiteInfo>> GetWebsitesByUrl(string url)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
-                .AllTypes()
+                .Type(Constants.VISITED_WEBSITES_INDEX)
                 .From(0)
                 .Size(15)
                 .Query(q => q
@@ -144,9 +208,14 @@ namespace ElasticsearchService.OutputManagers
                 )
             );
 
-            var results = searchResult.Documents;
+            var results = searchResult.Hits;
 
             return results.ToList();
+        }
+
+        public string ToJson(IResponse response)
+        {
+            return Encoding.UTF8.GetString(response.ApiCall.RequestBodyInBytes);
         }
 
     }

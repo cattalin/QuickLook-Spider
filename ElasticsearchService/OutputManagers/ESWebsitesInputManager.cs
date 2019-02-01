@@ -7,9 +7,11 @@ using Shared.Models;
 
 namespace ElasticsearchService.OutputManagers
 {
-    public interface IOutputManager
+    public class ESWebsitesInputManager : ESInputManager<WebsiteInfo>
     {
-        void OutputEntry(WebsiteInfo retrievedInfo);
-        Task OutputEntryAsync(WebsiteInfo retrievedInfo);
+        public ESWebsitesInputManager()
+        {
+            this.index = "websites";
+        }
     }
 }

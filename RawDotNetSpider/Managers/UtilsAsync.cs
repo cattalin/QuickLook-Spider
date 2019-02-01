@@ -93,6 +93,15 @@ namespace Spider.Managers
             var _title = htmlDoc.DocumentNode.SelectSingleNode("//head//title");
             var title = _title?.InnerHtml;
 
+            var _html = htmlDoc.DocumentNode.SelectSingleNode("//html");
+
+            var _language = _html.HasAttributes
+                            && _html.Attributes.Where(a => a.Name
+                                .ToLower()
+                                .Equals("lang")
+                            ).Any()
+                ? _html.Attributes["lang"].Value
+                : "en";
 
             var _metas = htmlDoc.DocumentNode.SelectNodes("//meta");
             var metaDesc = _metas
@@ -118,13 +127,19 @@ namespace Spider.Managers
             var paragraphs = _paragraphs
                 ?.Select(p => WebUtility.HtmlDecode(p.InnerText));
 
+            var fullPage = _page.InnerText;
+
             return new WebsiteInfo
             {
+                Id = url,
                 Url = url,
                 Title = title,
                 DescriptionMeta = description,
                 Paragraphs = paragraphs.ToList(),
-                CreateDate = DateTime.Now
+                FullPageContent = fullPage,
+                Language = _language,
+                CreateDate = DateTime.Now,
+                UpdateDate = DateTime.Now
             };
         }
 
@@ -146,11 +161,6 @@ namespace Spider.Managers
                 return null;
 
             });
-
-            //var relatedWebsitesUrls = _hrefs
-            //                 ?.Where(_href => _href.StartsWith("http"))
-            //                 ?.Select(_href => _href);
-            //return relatedWebsitesUrls?.ToList();
 
 
             Uri baseUrl = new Uri(url);

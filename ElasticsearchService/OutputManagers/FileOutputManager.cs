@@ -2,11 +2,12 @@
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Shared.Interfaces;
 using Shared.Models;
 
 namespace ElasticsearchService.OutputManagers
 {
-    public class FileOutputManager : IDisposable, IOutputManager
+    public class FileOutputManager : IDisposable, IOutputManager<WebsiteInfo>
     {
         private readonly StreamWriter _streamWriter;
         private readonly JsonSerializer _serializer;
@@ -29,6 +30,17 @@ namespace ElasticsearchService.OutputManagers
         }
 
         public async Task OutputEntryAsync(WebsiteInfo retrievedInfo)
+        {
+
+            Console.WriteLine("Website --> " + retrievedInfo.Url);
+            Console.WriteLine("Title   --> " + retrievedInfo.Title);
+            Console.WriteLine("Desc    --> " + retrievedInfo.DescriptionMeta);
+
+
+            await Task.Run(() => _serializer.Serialize(_streamWriter, retrievedInfo));
+        }
+
+        public async Task UpdateEntryAsync(WebsiteInfo retrievedInfo, string Id)
         {
 
             Console.WriteLine("Website --> " + retrievedInfo.Url);

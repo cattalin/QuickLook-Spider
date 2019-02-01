@@ -5,6 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Spider.Managers;
 using ElasticsearchService.OutputManagers;
+using Shared.Interfaces;
+using Shared.Models;
+using System.Web;
 
 namespace Spider
 {
@@ -16,14 +19,14 @@ namespace Spider
 
         static void Main(string[] args)
         {
-            List<string> urlList = new List<string> { "https://en.wikipedia.org/wiki/Stephen_III_of_Moldavia" };
+            List<string> urlList = new List<string> { "https://www.youtube.com/watch?v=e8CLsYzE5wk" };
             CrawlStatusManager.Init();
             CrawlStatusManager.AddPendingWebsites(urlList);
 
-            IOutputManager outputManager = new ElasticsearchOutputManager();
-//            IOutputManager outputManager = new FileOutputManager(filePath);
+            ESWebsitesInputManager crawledWebsites = new ESWebsitesInputManager();
+            ESPendingWebsitesInputManager pendingWebsites = new ESPendingWebsitesInputManager();
 
-            CrawlManager crawlManager = new CrawlManager(outputManager);
+            CrawlManager crawlManager = new CrawlManager(crawledWebsites, pendingWebsites);
             
             crawlManager.StartCrawlingAsync(urlList);
 

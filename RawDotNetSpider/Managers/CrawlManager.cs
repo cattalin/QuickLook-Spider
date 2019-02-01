@@ -9,6 +9,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using ElasticsearchService.OutputManagers;
+using Shared.Interfaces;
+using Shared.Models;
+using Shared;
 
 namespace Spider.Managers
 {
@@ -16,25 +19,22 @@ namespace Spider.Managers
     {
         private HttpsSanitizerWebClient httpsSanitizerWebClient;
 
-        private IOutputManager outputManager;
+        private ESWebsitesInputManager crawledWebsites;
+        private ESPendingWebsitesInputManager pendingWebsites;
 
         private List<Task> crawlTasks = new List<Task>();
 
-        public CrawlManager(IOutputManager outputManager)
+        public CrawlManager(ESWebsitesInputManager crawledWebsites, ESPendingWebsitesInputManager pendingWebsites)
         {
-            this.outputManager = outputManager;
+            this.crawledWebsites = crawledWebsites;
+            this.pendingWebsites = pendingWebsites;
             this.httpsSanitizerWebClient = new HttpsSanitizerWebClient();
         }
 
         public async Task StartCrawlingAsync(List<string> urlSeeds)
         {
-            //ParseWebsiteRecursivelyAsync(urlSeeds.First());
-            //using (esOutputManager = new ElasticsearchOutputManager())
-            //{
-            //ParseWebsiteRecursivelyAsync(urlSeeds.First(), esOutputManager);
-            //}
-
-            await PeriodicCrawlAsync(new TimeSpan(0, 0, 1), new CancellationToken(false));
+            await StartCrawlThreadsAsync();
+//            await PeriodicCrawlAsync(new TimeSpan(0, 0, 1), new CancellationToken(false));
         }
 
         public async Task PeriodicCrawlAsync(TimeSpan interval, CancellationToken cancellationToken)
@@ -42,67 +42,85 @@ namespace Spider.Managers
             while (true)
             {
                 await CrawlBatch();
-                await Task.Delay(interval, cancellationToken);
+//                await Task.Delay(interval, cancellationToken);
             }
         }
 
         public async Task CrawlBatch()
         {
-            await Task.Run(() =>
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            Console.WriteLine("STARTED_BATCH");
+
+//            await Task.Run(() =>
+//            {
+//                Parallel.ForEach(pendingWebsites.GetNextPendingBatchRandomNest(Constants.BATCH_SIZE),
+//                    pendingWeb => { ParseWebsiteAsync(pendingWeb.Url); });
+//            });
+
+            List<Task> tasks = new List<Task>();
+            pendingWebsites.GetNextPendingBatchRandomNest(Constants.BATCH_SIZE).ForEach(async pendingWeb =>
             {
-                Parallel.ForEach(CrawlStatusManager.TakeNextBatch(), pendingUrl =>
-                {
-                    if (!CrawlStatusManager.IsUrlVisitedThisSession(pendingUrl))
-                    {
-                        ParseWebsiteAsync(pendingUrl);
-                    }
-                    else CrawlStatusManager.IncreaseVisitedCount();
-                });
+                tasks.Add(ParseWebsiteAsync(pendingWeb.Url));
             });
 
+
+            await Task.WhenAll(tasks);
+
+            Console.WriteLine($"ENDED_BATCH({stopwatch.ElapsedMilliseconds})");
+        }
+
+        public async Task StartCrawlThreadsAsync()
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            Console.WriteLine("STARTED_BATCH");
+
+            for(var i = 0; i < Constants.BATCH_SIZE; i++)
+            {
+                Task.Run(async () =>
+                {
+//                    Console.WriteLine($"1");
+                    while (true)
+                    {
+//                        Console.WriteLine($"STARTED_THREAD {i}");
+
+                        var pendingWebsite = pendingWebsites.GetNextPendingBatchRandomNest(1).First();
+                        await ParseWebsiteAsync(pendingWebsite.Url);
+
+//                        Console.WriteLine($"ENDED_THREAD {i}");
+                    }
+                });
+            }
+
+            Console.WriteLine($"ENDED_BATCH({stopwatch.ElapsedMilliseconds})");
         }
 
         public async Task ParseWebsiteAsync(string currentUrl)
         {
             try
             {
-                Stopwatch stopwatch;
-
-                stopwatch = Stopwatch.StartNew();
-
-                CrawlStatusManager.MarkAsVisited(currentUrl);
+                Stopwatch stopwatch = Stopwatch.StartNew();
 
                 var htmlDoc = await UtilsAsync.LoadWebsiteAsync(currentUrl);
 
                 var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(currentUrl, htmlDoc);
 
-                if (!CrawlStatusManager.IsWebsiteRecentlyIndexed(currentUrl))
-                    outputManager.OutputEntryAsync(retrievedInfo);
+                await this.crawledWebsites.OutputEntryAsync(retrievedInfo, retrievedInfo.Id);
 
                 var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
+                var pendingWebsites = Utils.ConvertUrlsToModelList(relatedWebsiteUrls);
+
+                await this.pendingWebsites.BulkOutputAsync(pendingWebsites);
 
                 stopwatch.Stop();
 
                 Console.WriteLine(
                     $@"Time Elapsed: {stopwatch.ElapsedMilliseconds} for crawling {currentUrl} with another {relatedWebsiteUrls.Count} referenced websites.");
 
-                await Task.Run(() =>
-                {
-                    foreach (var relatedWebsiteUrl in relatedWebsiteUrls)
-                    {
-                        if (!CrawlStatusManager.IsUrlVisitedThisSession(relatedWebsiteUrl))
-                        {
-                            CrawlStatusManager.AddPendingWebsite(relatedWebsiteUrl);
-                        }
-                    }
-                });
-
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Console.WriteLine("Untreated error appeared. Skipping ---> " + currentUrl);
             }
-
         }
 
         public async Task ParseWebsiteRecursivelyAsync(string currentUrl)
@@ -123,7 +141,7 @@ namespace Spider.Managers
 
                     var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(currentUrl, htmlDoc);
 
-                    await outputManager.OutputEntryAsync(retrievedInfo);
+                    await crawledWebsites.OutputEntryAsync(retrievedInfo);
 
                     var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
 
@@ -146,7 +164,7 @@ namespace Spider.Managers
             }
         }
 
-        public void ParseQueue(List<string> urlList, IOutputManager outputManager)
+        public void ParseQueue(List<string> urlList, ESWebsitesInputManager outputManager)
         {
             int i = 0;
             while (i < urlList.Count)
@@ -199,7 +217,7 @@ namespace Spider.Managers
 
                         var retrievedInfo = Utils.RetrieveWebsiteInfo(url, htmlDoc);
 
-                        outputManager.OutputEntry(retrievedInfo);
+                        crawledWebsites.OutputEntry(retrievedInfo);
 
                         var relatedWebsiteUrls = Utils.RetrieveRelatedWebsitesUrls(url, htmlDoc);
 

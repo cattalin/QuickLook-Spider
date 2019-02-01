@@ -34,7 +34,7 @@ namespace Interface.Controllers
 
             Pagination pagination = CreatePagination(take, page);
 
-            NestClient client = new NestClient();
+            ESOutputManager client = new ESOutputManager();
             var searchResult = client
                 .FullTextSearch(searchedContent, pagination)
                 .ToDto(pagination, searchedContent);
