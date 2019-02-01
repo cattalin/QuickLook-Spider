@@ -62,9 +62,6 @@
   <ItemGroup>
     <Compile Include="Managers\CrawlManager.cs" />
     <Compile Include="Managers\CrawlStatusManager.cs" />
-    <Compile Include="Managers\HttpSanitizerWebClient.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Managers\Utils.cs" />
     <Compile Include="Managers\UtilsAsync.cs" />
     <Compile Include="Program.cs" />
