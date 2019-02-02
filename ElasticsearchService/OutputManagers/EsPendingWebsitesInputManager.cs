@@ -76,6 +76,9 @@ namespace ElasticsearchService.OutputManagers
                 )
             );
 
+            if (searchResponse.Hits.Count == 0)
+                throw new Exception("Elasticsearch Failure");
+
             return searchResponse.Hits.Select(h => h.Source).ToList();
         }
     }

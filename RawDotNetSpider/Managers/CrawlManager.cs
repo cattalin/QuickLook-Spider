@@ -81,10 +81,18 @@ namespace Spider.Managers
 //                    Console.WriteLine($"1");
                     while (true)
                     {
+                        try
+                        {
+
+                            var pendingWebsite = pendingWebsites.GetNextPendingBatchRandomNest(1).First();
+                            await ParseWebsiteAsync(pendingWebsite.Url);
+                        }
+                        catch (Exception Ex)
+                        {
+                            Console.WriteLine(Ex.Message);
+                        }
 //                        Console.WriteLine($"STARTED_THREAD {i}");
 
-                        var pendingWebsite = pendingWebsites.GetNextPendingBatchRandomNest(1).First();
-                        await ParseWebsiteAsync(pendingWebsite.Url);
 
 //                        Console.WriteLine($"ENDED_THREAD {i}");
                     }
