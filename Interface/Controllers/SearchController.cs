@@ -16,7 +16,7 @@ namespace Interface.Controllers
     {
         public IActionResult Search()
         {
-            return View();
+            return View(new SearchContentDTO());
         }
 
         [HttpPost]
@@ -35,17 +35,14 @@ namespace Interface.Controllers
         [Route("AdvancedResults")]
         public IActionResult AdvancedResults(SearchContentDTO searchedContent)
         {
-            ViewData["SearchedContent"] = new SearchContentDTO
-            {
-                Input = searchedContent.Input
-            };
+            ViewData["SearchedContent"] = searchedContent;
 
             Pagination pagination = CreatePagination(searchedContent);
 
             ESOutputManager client = new ESOutputManager();
             var searchResult = client
                 .FullTextSearchAdvanced(searchedContent, pagination)
-                .ToDto(pagination, searchedContent.Input);
+                .ToDto(pagination, searchedContent);
 
             if (searchResult.Hits.Count == 0)
             {
@@ -58,17 +55,19 @@ namespace Interface.Controllers
         [Route("Results")]
         public IActionResult Results(string searchedContent, int take, int page)
         {
-            ViewData["SearchedContent"] = new SearchContentDTO
+            var searchedContentDto = new SearchContentDTO()
             {
                 Input = searchedContent
             };
+
+            ViewData["SearchedContent"] = searchedContentDto;
 
             Pagination pagination = CreatePagination(take, page);
 
             ESOutputManager client = new ESOutputManager();
             var searchResult = client
                 .FullTextSearch(searchedContent, pagination)
-                .ToDto(pagination, searchedContent);
+                .ToDto(pagination, searchedContentDto);
 
             if (searchResult.Hits.Count == 0)
             {

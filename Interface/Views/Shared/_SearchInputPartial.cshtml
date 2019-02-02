@@ -20,15 +20,14 @@
         <div class="text-center">
             <div id="advanced-search-dropdown-toggle" class="form-check mr-2 mt-1" onclick="showHide()">
                 <label class="form-check-label" onclick="showHide()">
-                    <input type="checkbox" asp-for="IsAdvancedSearch"  onclick="showHide()" class="form-check-input"><i class="fas fa-info-circle"></i> Advanced Search
+                    <input type="checkbox" asp-for="IsAdvancedSearch" onclick="showHide()" class="form-check-input"><i class="fas fa-info-circle"></i> Advanced Search
                 </label>
             </div>
 
             <div class="container">
-                <div id="show-hide" style="display: none;">
+                <div id="show-hide" style="@("display: " + (Model.IsAdvancedSearch ? "block;" : "none;"))">
 
                     <div class="options mt-2">
-
                         @* Match Exact Words *@
                         <div class="pr-3">
                             <div class="form-check mr-2 mt-1">
@@ -76,7 +75,7 @@
                                         <span class="dropdown-item">
                                             <div class="form-check">
                                                 <label class="form-check-label">
-                                                    <input type="radio" asp-for="Language" name="Language" value="@lang.Key" checked class="form-check-input">@lang.Name
+                                                    <input type="radio" asp-for="Language" name="Language" value="@lang.Key" class="form-check-input">@lang.Name
                                                 </label>
                                             </div>
                                         </span>
@@ -88,15 +87,15 @@
                         @* Website Date *@
                         <div class="pr-3">
                             <span class="mr-2 mt-1">Website date</span>
-                            <input type="date" asp-for="StartDate" class="form-control form-control-sm"/>
+                            <input type="date" asp-for="StartDate" class="form-control form-control-sm" />
                             -
-                            <input type="date" asp-for="EndDate" class="form-control form-control-sm"/>
+                            <input type="date" asp-for="EndDate" class="form-control form-control-sm" />
                         </div>
 
                         @* Fuzziness *@
                         <div class="pr-3">
                             <span class="mr-2">Fuzziness</span>
-                            <input type="number" asp-for="Fuzziness" id="fuzziness-crit" min="0" style="width: 60px;" class="form-control form-control-sm" placeholder="1"/>
+                            <input type="number" asp-for="Fuzziness" id="fuzziness-crit" min="0" style="width: 60px;" class="form-control form-control-sm" placeholder="1" />
                         </div>
 
                     </div>
@@ -120,6 +119,12 @@
         } else {
             x.style.display = "none";
         }
+    }
+
+    function show() {
+        var x = document.getElementById("show-hide");
+        x.style.display = "block";
+
     }
 
 </script>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Interface.Models;
 
 namespace Shared.DTOs
 {
@@ -8,6 +9,6 @@ namespace Shared.DTOs
     {
         public long Took { get; set; }
         public long Total { get; set; }
-        public string SearchedContent { get; set; }
+        public SearchContentDTO SearchedContent { get; set; }
     }
 }

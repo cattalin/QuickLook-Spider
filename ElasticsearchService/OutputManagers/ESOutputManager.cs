@@ -25,7 +25,7 @@ namespace ElasticsearchService.OutputManagers
                 .DefaultFieldNameInferrer(d => { return d.First().ToString().ToUpper() + d.Substring(1); })
                 .EnableDebugMode(response =>
                 {
-                    if (response.RequestBodyInBytes!= null)
+                    if (response.RequestBodyInBytes != null)
                     {
                         Console.WriteLine($"Requested " +
                                           $"{Encoding.UTF8.GetString(response.RequestBodyInBytes)}\n" +
@@ -35,7 +35,7 @@ namespace ElasticsearchService.OutputManagers
                     {
                         Console.WriteLine($"Requested without body");
                     }
-                    if (response.ResponseBodyInBytes!= null)
+                    if (response.ResponseBodyInBytes != null)
                     {
                         Console.WriteLine($"Status: {response.HttpStatusCode}\n" +
                                           $"{Encoding.UTF8.GetString(response.ResponseBodyInBytes)}\n" +
@@ -95,7 +95,7 @@ namespace ElasticsearchService.OutputManagers
         public ISearchResponse<WebsiteInfo> FullTextSearchAdvanced(SearchContentDTO searchContent, Pagination pagination)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
-                .Index(Constants.VISITED_WEBSITES_INDEX)
+                .Index(searchContent.MatchUncrawledWebsites ? Constants.PENDING_WEBSITES_INDEX : Constants.VISITED_WEBSITES_INDEX)
                 .Type("_doc")
                 .From(pagination.From)
                 .Size(pagination.Take)
@@ -104,11 +104,17 @@ namespace ElasticsearchService.OutputManagers
                         .Must(
                             m => m.MultiMatch(w => w
                                 .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
-//                                .Fields(f => f.Field("Url"))
+                                //                                .Fields(f => f.Field("Url"))
                                 .Query(searchContent.Input)
-                                .Fuzziness(Fuzziness.EditDistance(searchContent.Fuzziness))),
-                            m => m.Term(t => t.Language, searchContent.Language)
+                                .Fuzziness(Fuzziness.EditDistance(searchContent.Fuzziness)))
+//                            , m => m.Term(t => t.Language, searchContent.Language)
+//                                , m => m.DateRange(t => 
+//                                    t.Field(f => f.CreateDate)
+//                                        .GreaterThanOrEquals(searchContent.StartDate)
+//                                        .LessThanOrEquals(searchContent.EndDate)
+//                                )
                         )
+                        .Should(m => m.Term(t => t.Language, searchContent.Language)).Boost(2.5)
                     )
                 )
                 .Highlight(h => h.PreTags("<b>").PostTags("</b>")
@@ -133,9 +139,10 @@ namespace ElasticsearchService.OutputManagers
                             m => m.MultiMatch(w => w
                                 .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
                                 .Query(searchedContent)
-                                .Fuzziness(Fuzziness.EditDistance(2))),
-                            m => m.Term(t => t.Language, "en")
+                                .Fuzziness(Fuzziness.EditDistance(2)))
+                            , m => m.Term(t => t.Language, "en")
                             )
+//                        .Should(m => m.Term(t => t.Language, "en"))
                     )
                 )
                 .Highlight(h => h.PreTags("<b>").PostTags("</b>")

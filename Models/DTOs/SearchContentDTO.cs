@@ -22,6 +22,14 @@ namespace Interface.Models
         public int? Take { get; set; }
         public int? Page { get; set; }
 
+        public SearchContentDTO()
+        {
+            Fuzziness = 1;
+            StartDate = DateTime.Now.AddDays(-100);
+            EndDate = DateTime.Now;
+            Language = "en";
+        }
+
         public override string ToString()
         {
             return Input;

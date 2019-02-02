@@ -4,12 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Interface.Models;
 
 namespace Shared.DTOs
 {
     public static class NestToDtoMapper
     {
-        public static SearchResultDto ToDto(this ISearchResponse<WebsiteInfo> searchResponse, Pagination pagination, string searchedContent)
+        public static SearchResultDto ToDto(this ISearchResponse<WebsiteInfo> searchResponse, Pagination pagination, SearchContentDTO searchedContent)
         {
 
             SearchResultDto result = new SearchResultDto
