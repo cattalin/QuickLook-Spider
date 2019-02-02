@@ -101,7 +101,7 @@ for details on configuring this project to bundle and minify static web assets. 
 }
 
 .nav-container {
-    display: -webkit-inline-box;
+    display: flex;
     margin: auto;
     text-align: center;
     padding: 15px;
@@ -155,8 +155,24 @@ for details on configuring this project to bundle and minify static web assets. 
     display: inline-flex;
 }
 
+#advanced-search-dropdown-toggle {
+    cursor: pointer;
+    font-size: 20px;
+    letter-spacing: 1px;
+    color: #007bff;
+}
+
+    #advanced-search-dropdown-toggle > .form-check-label > .form-check-input {
+        visibility: hidden;
+    }
+
+.dropdown-menu.show {
+    display: inline-flex;
+    margin-top: 7px;
+}
 
 /* Responsive */
+
 
 
 body, hmtl {
@@ -164,4 +180,23 @@ body, hmtl {
     min-height: 100vh;
     min-width: 100%;
     min-width: 100vw;
+}
+
+@media (min-width: 320px) and (max-width: 823px) {
+    #search-bar {
+        height: 50px;
+        font-size: 15px;
+    }
+
+    #advanced-search-dropdown-toggle {
+        font-size: 15px;
+    }
+
+    .o-2 {
+        display: inline-block;       
+    }
+
+    .o-2 > div {
+        margin-top: 5px;
+    }
 }

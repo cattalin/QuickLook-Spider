@@ -22,7 +22,6 @@ namespace Interface.Controllers
         [HttpPost]
         public IActionResult Search(SearchContentDTO searchedContent)
         {
-            searchedContent.IsAdvancedSearch = true;
             if (!searchedContent.IsAdvancedSearch)
             {
                 return RedirectToAction("Results", new { searchedContent = searchedContent.Input });

@@ -6,7 +6,7 @@
         <a href="@Url.Action("Search", "Search", null)">
             <img class="search-icon" style="margin-right: 15px;" src="~/images/search-logo-png-7.png" />
         </a>
-        <div>
+        <div style="width: 100%;">
             @{ await Html.RenderPartialAsync("_SearchInputPartial", Model); }
         </div>
 
