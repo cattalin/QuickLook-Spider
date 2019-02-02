@@ -8,6 +8,7 @@ using Elasticsearch.Net;
 using Shared;
 using Shared.Models;
 using System.Diagnostics;
+using Interface.Models;
 
 namespace ElasticsearchService.OutputManagers
 {
@@ -49,11 +50,6 @@ namespace ElasticsearchService.OutputManagers
                 .DefaultIndex(index);
 
             client = new ElasticClient(settings);
-
-//            settings.OnRequestCompleted(call =>
-//            {
-//                Debug.Write(Encoding.UTF8.GetString(call.RequestBodyInBytes));
-//            });
         }
 
         public List<WebsiteInfo> WilcardSearch(string searchedContent, Pagination pagination)
@@ -96,6 +92,34 @@ namespace ElasticsearchService.OutputManagers
             return results.ToList();
         }
 
+        public ISearchResponse<WebsiteInfo> FullTextSearchAdvanced(SearchContentDTO searchContent, Pagination pagination)
+        {
+            var searchResult = client.Search<WebsiteInfo>(s => s
+                .Index(Constants.VISITED_WEBSITES_INDEX)
+                .Type("_doc")
+                .From(pagination.From)
+                .Size(pagination.Take)
+                .Query(q => q
+                    .Bool(b => b
+                        .Must(
+                            m => m.MultiMatch(w => w
+                                .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
+//                                .Fields(f => f.Field("Url"))
+                                .Query(searchContent.Input)
+                                .Fuzziness(Fuzziness.EditDistance(searchContent.Fuzziness))),
+                            m => m.Term(t => t.Language, searchContent.Language)
+                        )
+                    )
+                )
+                .Highlight(h => h.PreTags("<b>").PostTags("</b>")
+                    .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
+                )
+
+            );
+
+            return searchResult;
+        }
+
         public ISearchResponse<WebsiteInfo> FullTextSearch(string searchedContent, Pagination pagination)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
@@ -123,33 +147,6 @@ namespace ElasticsearchService.OutputManagers
             return searchResult;
         }
 
-        public ISearchResponse<WebsiteInfo> FullTextSearchtest(string searchedContent, Pagination pagination)
-        {
-            var searchResult = client.Search<WebsiteInfo>(s => s
-                .Index(Constants.VISITED_WEBSITES_INDEX)
-                .Type("_doc")
-                .From(pagination.From)
-                .Size(pagination.Take)
-                .Query(q =>
-                    q.MultiMatch(w => w
-                            .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
-                            .Query(searchedContent)
-                            .Fuzziness(Fuzziness.EditDistance(2))
-                        )
-                    &&
-                    q.Term(t => t.Language, "en")
-                    )
-                .Highlight(h => h.PreTags("<b>").PostTags("</b>")
-                    .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
-                )
-
-            );
-
-
-
-            return searchResult;
-        }
-
         public ISearchResponse<WebsiteInfo> FullTextSearch(string searchedContent)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
@@ -163,6 +160,31 @@ namespace ElasticsearchService.OutputManagers
                         .Query(searchedContent)
                         .Fuzziness(Fuzziness.EditDistance(1))
                     )
+                )
+                .Highlight(h => h.PreTags("<b>").PostTags("</b>")
+                    .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
+                )
+
+            );
+
+            return searchResult;
+        }
+
+        public ISearchResponse<WebsiteInfo> FullTextSearchtest(string searchedContent, Pagination pagination)
+        {
+            var searchResult = client.Search<WebsiteInfo>(s => s
+                .Index(Constants.VISITED_WEBSITES_INDEX)
+                .Type("_doc")
+                .From(pagination.From)
+                .Size(pagination.Take)
+                .Query(q =>
+                    q.MultiMatch(w => w
+                        .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
+                        .Query(searchedContent)
+                        .Fuzziness(Fuzziness.EditDistance(2))
+                    )
+                    &&
+                    q.Term(t => t.Language, "en")
                 )
                 .Highlight(h => h.PreTags("<b>").PostTags("</b>")
                     .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))

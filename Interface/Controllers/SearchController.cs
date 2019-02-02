@@ -29,10 +29,34 @@ namespace Interface.Controllers
             }
             else
             {
-                return RedirectToAction("Results", "AdvancedSearch", searchedContent);
+                return RedirectToAction("AdvancedResults", searchedContent);
             }
         }
 
+        [Route("AdvancedResults")]
+        public IActionResult AdvancedResults(SearchContentDTO searchedContent)
+        {
+            ViewData["SearchedContent"] = new SearchContentDTO
+            {
+                Input = searchedContent.Input
+            };
+
+            Pagination pagination = CreatePagination(searchedContent);
+
+            ESOutputManager client = new ESOutputManager();
+            var searchResult = client
+                .FullTextSearchAdvanced(searchedContent, pagination)
+                .ToDto(pagination, searchedContent.Input);
+
+            if (searchResult.Hits.Count == 0)
+            {
+                return View("NotFound");
+            }
+
+            return View("Results", searchResult);
+        }
+
+        [Route("Results")]
         public IActionResult Results(string searchedContent, int take, int page)
         {
             ViewData["SearchedContent"] = new SearchContentDTO
