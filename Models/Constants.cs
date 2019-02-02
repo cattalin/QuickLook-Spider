@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Shared.Models;
 
 namespace Shared
 {
@@ -12,5 +13,29 @@ namespace Shared
         public const string PENDING_WEBSITES_INDEX = "pending_websites";
 
         public const int BATCH_SIZE = 20;
+
+        public static Language[] Languages =
+        {
+            new Language()
+            {
+                Name = "English",
+                Key = "en"
+            },
+            new Language()
+            {
+                Name = "Romana",
+                Key = "ro"
+            },
+            new Language()
+            {
+                Name = "French",
+                Key = "fr"
+            },
+            new Language()
+            {
+                Name = "German",
+                Key = "de"
+            },
+        };
     }
 }
