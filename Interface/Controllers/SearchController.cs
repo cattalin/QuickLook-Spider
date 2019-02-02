@@ -12,7 +12,7 @@ using Shared.Models;
 
 namespace Interface.Controllers
 {
-    public class SearchController : Controller
+    public class SearchController : BaseController
     {
         public IActionResult Search()
         {
@@ -45,34 +45,6 @@ namespace Interface.Controllers
             }
 
             return View(searchResult);
-        }
-
-        [AllowAnonymous]
-        public IActionResult Error()
-        {
-            return View();
-        }
-
-        private Pagination CreatePagination(int take, int page)
-        {
-            Pagination pagination = new Pagination()
-            {
-                Take = 10,
-                Page = 1,
-                From = 0
-            };
-
-            if (take != 0 && page != 0)
-            {
-                pagination = new Pagination()
-                {
-                    Take = take,
-                    Page = page,
-                    From = take * (page - 1)
-                };
-            }
-
-            return pagination;
         }
     }
 }

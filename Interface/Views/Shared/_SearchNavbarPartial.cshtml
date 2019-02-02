@@ -4,9 +4,9 @@
 
     <div class="container nav-container">
         <a href="@Url.Action("Search", "Search", null)">
-            <img class="search-icon" src="~/images/search-logo-png-7.png" />
+            <img class="search-icon" style="margin-right: 15px;" src="~/images/search-logo-png-7.png" />
         </a>
-        <div style="width: 800px;">
+        <div>
             @{ await Html.RenderPartialAsync("_SearchInputPartial", Model); }
         </div>
 

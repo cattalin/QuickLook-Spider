@@ -111,3 +111,57 @@ for details on configuring this project to bundle and minify static web assets. 
 .page-link {
     border: none;
 }
+
+/* Input group */
+
+
+.btn:focus, .btn:active:focus, .btn.active:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.input-group-append > .btn {
+    border-left: none;
+}
+
+.input-group-append > .btn:focus, .btn:active:focus, .btn.active:focus,
+.btn.focus, .btn:active.focus, .btn.active.focus {
+    outline: none;
+}
+.main-search:focus, .input-group-append:active, .main-search:active, .input-group-append:focus, .input-group-text:focus, .input-group-text:active {
+    border-color: #cccccc;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.input-group-text {
+    background-color: white !important;
+    cursor: pointer;
+}
+
+.input-group > .form-control {
+    border-right: 0;
+}
+
+.in-search {
+    width: 25px;
+    height: 25px;
+    margin-top: 0;
+}
+
+/* Advanced Search */
+
+.options {
+    display: inline-flex;
+}
+
+
+/* Responsive */
+
+
+body, hmtl {
+    min-height: 100%;
+    min-height: 100vh;
+    min-width: 100%;
+    min-width: 100vw;
+}

@@ -4,8 +4,106 @@
 <form asp-action="Search" class="form-inline">
 
     <div class="w-100">
-        <input asp-for="Input" class="form-control form-control-lg mr-sm-2 w-75 main-search" type="search" placeholder="Search topics or keywords" aria-label="Search">
+        
+        <div class="input-group search-partial mb-3">
+            <input asp-for="Input" type="search" class="form-control form-control-lg mr-0 w-75 main-search" placeholder="Search topics or keywords" aria-label="Search" />
+            
+            <div class="input-group-append">
+                @* <input asp-for="Input" type="button" > *@
+                <button type="submit" class="btn input-group-text"><img class="in-search" src="/images/search-logo-png-7.png"></button>
+                @* </input> *@
+            </div>
+        
+        </div>
+        
+        <div>
+
+            <a class="dropdown-toggle d-block" aria-haspopup="true" aria-expanded="false">
+                Advanced Search
+            </a>
+
+            <div class="options mt-2">
+                
+                @* Match Exact Words *@
+                <div class="pr-3">
+                    <div class="form-check mr-2 mt-1">
+                        <label class="form-check-label">
+                            <input type="checkbox" class="form-check-input" value="">Match exact words
+                        </label>
+                    </div>
+                </div>
+
+                @* Match Exact Sentence *@
+                <div class="pr-3">
+                    <div class="form-check mr-2 mt-1">
+                        <label class="form-check-label">
+                            <input type="checkbox" class="form-check-input" value="">Match exact sentence
+                        </label>
+                    </div>
+                </div>
+
+                @* Match Uncrowled Websites  *@
+                <div class="pr-3">
+                    <div class="form-check mr-2 mt-1">
+                        <label class="form-check-label">
+                            <input type="checkbox" class="form-check-input" value="">Match uncrowled websites
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="options mt-3">
+
+                @* Website Language *@
+                <div class="pr-3" style="display: inline-flex;">
+                    <span class="mr-2 mt-1">Website lang</span>
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Select
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <span class="dropdown-item">
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="radio" class="form-check-input" name="lang">En
+                                    </label>
+                                </div>
+                            </span>
+                            <span class="dropdown-item">
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="radio" class="form-check-input" name="lang">Ro
+                                    </label>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                @* Website Date *@
+                <div class="pr-3">
+                    <span class="mr-2 mt-1">Website date</span>
+                    <input asp-for="Input" type="date" class="form-control form-control-sm" />
+                    -
+                    <input asp-for="Input" type="date" class="form-control form-control-sm" />
+                </div>
+
+                @* Fuzziness *@
+                <div class="pr-3">
+                    <span class="mr-2">Fuzziness</span>
+                    <input asp-for="Input" type="number" min="0" style="width: 60px;" class="form-control form-control-sm" placeholder="1" />
+                </div>
+
+
+            </div>
+
+
+        </div>
+
         @* <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button> *@
     </div>
     
+    
+    
 </form>
+
