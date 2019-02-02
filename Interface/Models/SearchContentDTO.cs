@@ -19,6 +19,8 @@ namespace Interface.Models
         public DateTime EndDate { get; set; }
 
         public int Fuzziness { get; set; }
+        public int? Take { get; set; }
+        public int? Page { get; set; }
 
         public override string ToString()
         {

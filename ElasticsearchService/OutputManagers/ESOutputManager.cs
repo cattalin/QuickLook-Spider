@@ -122,6 +122,7 @@ namespace ElasticsearchService.OutputManagers
 
             return searchResult;
         }
+
         public ISearchResponse<WebsiteInfo> FullTextSearchtest(string searchedContent, Pagination pagination)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
@@ -137,7 +138,6 @@ namespace ElasticsearchService.OutputManagers
                         )
                     &&
                     q.Term(t => t.Language, "en")
-
                     )
                 .Highlight(h => h.PreTags("<b>").PostTags("</b>")
                     .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
