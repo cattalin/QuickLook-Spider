@@ -21,7 +21,6 @@ namespace Interface.Controllers
             return View();
         }
 
-//        [HttpPost]
         [Route("results")]
         public IActionResult Results(SearchContentDTO searchedContent)
         {

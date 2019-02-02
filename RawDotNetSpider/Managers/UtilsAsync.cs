@@ -66,28 +66,6 @@ namespace Spider.Managers
             }
         }
 
-
-
-        static public async Task<HtmlDocument> LoadWebsite(string url, HttpsSanitizerWebClient webclient)
-        {
-            try
-            {
-                var sanitizedUrl = WebUtility.UrlDecode(url);
-
-                var website = webclient.DownloadString(sanitizedUrl);
-
-                var htmlDoc = new HtmlDocument();
-                htmlDoc.LoadHtml(website);
-
-                return htmlDoc;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("The given Url might be malformed ---> " + url);
-                throw ex;
-            }
-        }
-
         static public async Task<WebsiteInfo> RetrieveWebsiteInfoAsync(string url, HtmlDocument htmlDoc)
         {
             var _title = htmlDoc.DocumentNode.SelectSingleNode("//head//title");
