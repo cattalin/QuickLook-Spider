@@ -62,9 +62,6 @@
   <ItemGroup>
     <Compile Include="Managers\CrawlManager.cs" />
     <Compile Include="Managers\CrawlStatusManager.cs" />
-    <Compile Include="Managers\HttpSanitizerWebClient.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Managers\Utils.cs" />
     <Compile Include="Managers\UtilsAsync.cs" />
     <Compile Include="Program.cs" />
@@ -75,13 +72,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ElasticsearchService\ElasticsearchService.csproj">
+    <ProjectReference Include="..\ElasticsearchService\QuickLook.ElasticsearchService.csproj">
       <Project>{e60fe663-eb2b-4767-90a1-6237b2949e36}</Project>
-      <Name>ElasticsearchService</Name>
+      <Name>QuickLook.ElasticsearchService</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Models\Shared.csproj">
+    <ProjectReference Include="..\Models\QuickLook.Shared.csproj">
       <Project>{3fdb23f1-3e83-4c3b-942c-c0b7fa8e0f05}</Project>
-      <Name>Shared</Name>
+      <Name>QuickLook.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

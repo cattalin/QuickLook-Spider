@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spider", "RawDotNetSpider\Spider.csproj", "{508CC00C-006E-41FF-9C5D-AFFB3452A32A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickLook.CrawlerEngine", "RawDotNetSpider\QuickLook.CrawlerEngine.csproj", "{508CC00C-006E-41FF-9C5D-AFFB3452A32A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interface", "Interface\Interface.csproj", "{D565FA06-4D87-405B-A3AE-BCFB75A7B895}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickLook.Web", "Interface\QuickLook.Web.csproj", "{D565FA06-4D87-405B-A3AE-BCFB75A7B895}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Models\Shared.csproj", "{3FDB23F1-3E83-4C3B-942C-C0B7FA8E0F05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickLook.Shared", "Models\QuickLook.Shared.csproj", "{3FDB23F1-3E83-4C3B-942C-C0B7FA8E0F05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticsearchService", "ElasticsearchService\ElasticsearchService.csproj", "{E60FE663-EB2B-4767-90A1-6237B2949E36}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickLook.ElasticsearchService", "ElasticsearchService\QuickLook.ElasticsearchService.csproj", "{E60FE663-EB2B-4767-90A1-6237B2949E36}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

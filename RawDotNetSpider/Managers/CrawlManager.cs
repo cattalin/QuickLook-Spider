@@ -17,8 +17,6 @@ namespace Spider.Managers
 {
     public class CrawlManager
     {
-        private HttpsSanitizerWebClient httpsSanitizerWebClient;
-
         private ESWebsitesInputManager crawledWebsites;
         private ESPendingWebsitesInputManager pendingWebsites;
 
@@ -28,7 +26,6 @@ namespace Spider.Managers
         {
             this.crawledWebsites = crawledWebsites;
             this.pendingWebsites = pendingWebsites;
-            this.httpsSanitizerWebClient = new HttpsSanitizerWebClient();
         }
 
         public async Task StartCrawlingAsync(List<string> urlSeeds)
