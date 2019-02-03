@@ -94,8 +94,47 @@ namespace ElasticsearchService.OutputManagers
 
         public ISearchResponse<WebsiteInfo> FullTextSearchAdvanced(SearchContentDTO searchContent, Pagination pagination)
         {
+
+            if (searchContent.MatchUncrawledWebsites)
+            {
+                return FullTextSearchPendingWebsites(searchContent, pagination);
+            }
+
             var searchResult = client.Search<WebsiteInfo>(s => s
-                .Index(searchContent.MatchUncrawledWebsites ? Constants.PENDING_WEBSITES_INDEX : Constants.VISITED_WEBSITES_INDEX)
+                        .Index( Constants.VISITED_WEBSITES_INDEX)
+                        .Type("_doc")
+                        .From(pagination.From)
+                        .Size(pagination.Take)
+                        .Query(q => q
+                                .Bool(b => b
+                                        .Must(
+                                            m => m.MultiMatch(w => w
+                                                .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
+                                                .Query(searchContent.Input)
+                                                .Fuzziness(Fuzziness.EditDistance(searchContent.Fuzziness)))
+                                            , m => m.Term(t => t.Language, searchContent.Language)
+                                                , m => m.DateRange(t => 
+                                                    t.Field(f => f.CreateDate)
+                                                        .GreaterThanOrEquals(searchContent.StartDate)
+                                                        .LessThanOrEquals(searchContent.EndDate)
+                                                )
+                                        )
+                                )
+                        )
+                        .Highlight(h => h.PreTags("<b>").PostTags("</b>")
+                            .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
+                        )
+
+                    )
+                ;
+
+            return searchResult;
+        }
+
+        public ISearchResponse<WebsiteInfo> FullTextSearchPendingWebsites(SearchContentDTO searchContent, Pagination pagination)
+        {
+            var searchResult = client.Search<WebsiteInfo>(s => s
+                .Index(Constants.PENDING_WEBSITES_INDEX)
                 .Type("_doc")
                 .From(pagination.From)
                 .Size(pagination.Take)
@@ -103,24 +142,15 @@ namespace ElasticsearchService.OutputManagers
                     .Bool(b => b
                         .Must(
                             m => m.MultiMatch(w => w
-                                .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
-                                //                                .Fields(f => f.Field("Url"))
+                                .Fields(f => f.Field("Url"))
                                 .Query(searchContent.Input)
                                 .Fuzziness(Fuzziness.EditDistance(searchContent.Fuzziness)))
-//                            , m => m.Term(t => t.Language, searchContent.Language)
-//                                , m => m.DateRange(t => 
-//                                    t.Field(f => f.CreateDate)
-//                                        .GreaterThanOrEquals(searchContent.StartDate)
-//                                        .LessThanOrEquals(searchContent.EndDate)
-//                                )
                         )
-                        .Should(m => m.Term(t => t.Language, searchContent.Language)).Boost(2.5)
                     )
                 )
                 .Highlight(h => h.PreTags("<b>").PostTags("</b>")
-                    .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
+                    .Fields(f => f.Field("Url"))
                 )
-
             );
 
             return searchResult;
