@@ -30,6 +30,24 @@ namespace Interface.Models
             Language = "en";
         }
 
+        public SearchContentDTO(SearchContentDTO other, int? newPage)
+        {
+            this.Input = other.Input;
+            this.Language = other.Language;
+
+            this.IsAdvancedSearch = other.IsAdvancedSearch;
+            this.MatchExactWords = other.MatchExactWords;
+            this.MatchExactContent = other.MatchExactContent;
+            this.MatchUncrawledWebsites = other.MatchUncrawledWebsites;
+
+            this.Fuzziness = other.Fuzziness;
+            this.StartDate = other.StartDate;
+            this.EndDate = other.EndDate;
+
+            this.Take = other.Take;
+            this.Page = newPage;
+        }
+
         public override string ToString()
         {
             return Input;

@@ -14,7 +14,7 @@
 <div class="container body-content">
 
     <h4 class="search-for-somth mb-4">Search results for @Model.SearchMetadata.SearchedContent - Found @Model.SearchMetadata.Total results in @Model.SearchMetadata.Took ms</h4>
-    <hr/>
+    <hr />
 
     @foreach (var result in Model.Hits)
     {
@@ -76,39 +76,39 @@
         <ul class="pagination justify-content-left mt-5 pt-2 pagination-md">
 
             <li class="page-item @(@Model.Pagination.Page == 1 ? "disabled" : "")">
-                @Html.ActionLink("Previous", "Results",
-                         new {searchedContent = Model.SearchMetadata.SearchedContent, Take = 10, Page = Model.Pagination.Page - 1}, new {@class = "page-link"})
+                @Html.ActionLink("Previous", Model.SearchMetadata.SearchedContent.IsAdvancedSearch? "AdvancedResults" : "Results",
+                    new SearchContentDTO(Model.SearchMetadata.SearchedContent, Model.Pagination.Page -1), new {@class = "page-link"})
             </li>
 
             @if (Model.Pagination.Page > 1)
             {
                 <li class="page-item">
-                    @Html.ActionLink((Model.Pagination.Page - 1).ToString(), "Results",
-                        new {searchedContent = Model.SearchMetadata.SearchedContent, Take = 10, Page = Model.Pagination.Page - 1}, new {@class = "page-link"})
+                    @Html.ActionLink((Model.Pagination.Page - 1).ToString(), Model.SearchMetadata.SearchedContent.IsAdvancedSearch ? "AdvancedResults" : "Results",
+                        new SearchContentDTO(Model.SearchMetadata.SearchedContent, Model.Pagination.Page - 1), new {@class = "page-link"})
                 </li>
             }
 
             <li class="page-item active">
-                @Html.ActionLink(Model.Pagination.Page.ToString(), "Results",
-                         new {searchedContent = Model.SearchMetadata.SearchedContent, Take = 10, Page = Model.Pagination.Page}, new {@class = "page-link"})
+                @Html.ActionLink(Model.Pagination.Page.ToString(), Model.SearchMetadata.SearchedContent.IsAdvancedSearch ? "AdvancedResults" : "Results",
+                    new SearchContentDTO(Model.SearchMetadata.SearchedContent, Model.Pagination.Page), new {@class = "page-link"})
             </li>
 
             <li class="page-item">
-                @Html.ActionLink((Model.Pagination.Page + 1).ToString(), "Results",
-                    new {searchedContent = Model.SearchMetadata.SearchedContent, Take = 10, Page = Model.Pagination.Page + 1}, new {@class = "page-link"})
+                @Html.ActionLink((Model.Pagination.Page + 1).ToString(), Model.SearchMetadata.SearchedContent.IsAdvancedSearch ? "AdvancedResults" : "Results",
+                    new SearchContentDTO(Model.SearchMetadata.SearchedContent, Model.Pagination.Page + 1), new {@class = "page-link"})
             </li>
 
             @if (Model.Pagination.Page == 1)
             {
                 <li class="page-item">
-                    @Html.ActionLink((Model.Pagination.Page + 2).ToString(), "Results",
-                        new {searchedContent = Model.SearchMetadata.SearchedContent, Take = 10, Page = Model.Pagination.Page + 2}, new {@class = "page-link"})
+                    @Html.ActionLink((Model.Pagination.Page + 2).ToString(), Model.SearchMetadata.SearchedContent.IsAdvancedSearch ? "AdvancedResults" : "Results",
+                        new SearchContentDTO(Model.SearchMetadata.SearchedContent, Model.Pagination.Page + 2), new {@class = "page-link"})
                 </li>
             }
 
             <li class="page-item">
-                @Html.ActionLink("Next", "Results",
-                         new {searchedContent = Model.SearchMetadata.SearchedContent, Take = 10, Page = Model.Pagination.Page + 1}, new {@class = "page-link"})
+                @Html.ActionLink("Next", Model.SearchMetadata.SearchedContent.IsAdvancedSearch ? "AdvancedResults" : "Results",
+                    new SearchContentDTO(Model.SearchMetadata.SearchedContent, Model.Pagination.Page + 1), new {@class = "page-link"})
             </li>
         </ul>
     </nav>
