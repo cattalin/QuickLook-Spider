@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -73,6 +72,11 @@ namespace Interface
                     name: "Error",
                     template: "error/",
                     defaults: new {controller = "Search", action = "Error" });
+                
+                routes.MapRoute(
+                    name: "api",
+                    template: "api/search-rest/",
+                    defaults: new {controller = "SearchRest", action = "Results" });
 
                 routes.MapRoute(
                     name: "DefaultsSearch",

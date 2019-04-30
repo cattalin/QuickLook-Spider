@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Models;
 
-namespace Interface.Controllers
+namespace QuickLook.Web.Controllers
 {
     public class BaseController : Controller
     {

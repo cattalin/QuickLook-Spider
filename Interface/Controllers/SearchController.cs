@@ -5,12 +5,11 @@ using System.Net;
 using System.Threading.Tasks;
 using ElasticsearchService.OutputManagers;
 using Interface.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTOs;
 using Shared.Models;
 
-namespace Interface.Controllers
+namespace QuickLook.Web.Controllers
 {
     public class SearchController : BaseController
     {
