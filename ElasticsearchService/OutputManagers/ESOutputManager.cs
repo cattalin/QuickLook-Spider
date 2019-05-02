@@ -8,7 +8,7 @@ using Elasticsearch.Net;
 using Shared;
 using Shared.Models;
 using System.Diagnostics;
-using Interface.Models;
+using Shared.DTOs;
 
 namespace ElasticsearchService.OutputManagers
 {

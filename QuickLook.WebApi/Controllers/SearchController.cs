@@ -8,33 +8,15 @@ using Shared.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Models;
 
-namespace QuickLook.Web.Controllers
+namespace QuickLook.WebApi.Controllers
 {
+    [Route("api/search")]
+    [ApiController]
     public class SearchController : BaseController
     {
-        public IActionResult Search()
-        {
-            return View(new SearchContentDTO());
-        }
-
-        [HttpPost]
-        public IActionResult Search(SearchContentDTO searchedContent)
-        {
-            if (!searchedContent.IsAdvancedSearch)
-            {
-                return RedirectToAction("Results", new { searchedContent = searchedContent.Input });
-            }
-            else
-            {
-                return RedirectToAction("AdvancedResults", searchedContent);
-            }
-        }
-
-        [Route("AdvancedResults")]
+        [HttpPost("advanced")]
         public IActionResult AdvancedResults(SearchContentDTO searchedContent)
         {
-            ViewData["SearchedContent"] = searchedContent;
-
             Pagination pagination = CreatePagination(searchedContent);
 
             ESOutputManager client = new ESOutputManager();
@@ -44,23 +26,24 @@ namespace QuickLook.Web.Controllers
 
             if (searchResult.Hits.Count == 0)
             {
-                return View("NotFound");
+                return NotFound();
             }
 
-            return View("Results", searchResult);
+            return Ok(searchResult);
         }
 
-        [Route("Results")]
-        public IActionResult Results(string searchedContent, int take, int page)
+        [HttpGet("simple")]
+        [ProducesResponseType(200)]
+        public IActionResult Results([FromQuery] string searchedContent, [FromQuery] int take, [FromQuery] int page)
         {
+            Pagination pagination = CreatePagination(take, page);
+
             var searchedContentDto = new SearchContentDTO()
             {
-                Input = searchedContent
+                Input = searchedContent,
+                Take = pagination.Take,
+                Page = pagination.Page,
             };
-
-            ViewData["SearchedContent"] = searchedContentDto;
-
-            Pagination pagination = CreatePagination(take, page);
 
             ESOutputManager client = new ESOutputManager();
             var searchResult = client
@@ -69,10 +52,10 @@ namespace QuickLook.Web.Controllers
 
             if (searchResult.Hits.Count == 0)
             {
-                return View("NotFound");
+                return NotFound();
             }
 
-            return View(searchResult);
+            return Ok(searchResult);
         }
     }
 }

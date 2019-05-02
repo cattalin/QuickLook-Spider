@@ -4,9 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using ElasticsearchService.OutputManagers;
-using Interface.Models;
-using Microsoft.AspNetCore.Mvc;
 using Shared.DTOs;
+using Microsoft.AspNetCore.Mvc;
 using Shared.Models;
 
 namespace QuickLook.Web.Controllers

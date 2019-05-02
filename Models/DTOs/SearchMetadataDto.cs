@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Interface.Models;
+using Shared.DTOs;
 
 namespace Shared.DTOs
 {

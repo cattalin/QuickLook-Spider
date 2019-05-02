@@ -1,22 +1,15 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Shared.DTOs;
+using Shared.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Shared.DTOs;
-using Shared.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
-namespace QuickLook.Web.Controllers
+namespace QuickLook.WebApi.Controllers
 {
-    public class BaseController : Controller
+    public class BaseController : ControllerBase
     {
-        [AllowAnonymous]
-        public IActionResult Error()
-        {
-            return View();
-        }
-
         protected Pagination CreatePagination(int take, int page)
         {
             Pagination pagination = new Pagination()

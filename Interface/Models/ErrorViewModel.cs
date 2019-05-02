@@ -1,6 +1,6 @@
 using System;
 
-namespace Interface.Models
+namespace Shared.DTOs
 {
     public class ErrorViewModel
     {
