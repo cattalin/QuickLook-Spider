@@ -65,7 +65,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Models\QuickLook.Shared.csproj">
+    <ProjectReference Include="..\QuickLook.Shared\QuickLook.Shared.csproj">
       <Project>{3fdb23f1-3e83-4c3b-942c-c0b7fa8e0f05}</Project>
       <Name>QuickLook.Shared</Name>
     </ProjectReference>

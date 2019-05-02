@@ -72,11 +72,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ElasticsearchService\QuickLook.ElasticsearchService.csproj">
+    <ProjectReference Include="..\QuickLook.ElasticsearchService\QuickLook.ElasticsearchService.csproj">
       <Project>{e60fe663-eb2b-4767-90a1-6237b2949e36}</Project>
       <Name>QuickLook.ElasticsearchService</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Models\QuickLook.Shared.csproj">
+    <ProjectReference Include="..\QuickLook.Shared\QuickLook.Shared.csproj">
       <Project>{3fdb23f1-3e83-4c3b-942c-c0b7fa8e0f05}</Project>
       <Name>QuickLook.Shared</Name>
     </ProjectReference>
