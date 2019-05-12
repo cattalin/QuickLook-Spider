@@ -24,14 +24,14 @@ namespace QuickLook.Web.Controllers
         {
             //ViewData["SearchedContent"] = searchedContent;
 
-            Pagination pagination = CreatePagination(searchedContent);
+            SearchPagination pagination = CreatePagination(searchedContent);
 
             ESOutputManager client = new ESOutputManager();
             var searchResult = client
                 .FullTextSearchAdvanced(searchedContent, pagination)
                 .ToDto(pagination, searchedContent);
 
-            if (searchResult.Hits.Count == 0)
+            if (searchResult.SearchHits.Count == 0)
             {
                 return NotFound();
             }
@@ -49,14 +49,14 @@ namespace QuickLook.Web.Controllers
 
             //ViewData["SearchedContent"] = searchedContentDto;
 
-            Pagination pagination = CreatePagination(take, page);
+            SearchPagination pagination = CreatePagination(take, page);
 
             ESOutputManager client = new ESOutputManager();
             var searchResult = client
                 .FullTextSearch(searchedContent, pagination)
                 .ToDto(pagination, searchedContentDto);
 
-            if (searchResult.Hits.Count == 0)
+            if (searchResult.SearchHits.Count == 0)
             {
                 return NotFound();
             }
@@ -64,9 +64,9 @@ namespace QuickLook.Web.Controllers
             return Ok(searchResult);
         }
 
-        protected Pagination CreatePagination(int take, int page)
+        protected SearchPagination CreatePagination(int take, int page)
         {
-            Pagination pagination = new Pagination()
+            SearchPagination pagination = new SearchPagination()
             {
                 Take = 10,
                 Page = 1,
@@ -75,7 +75,7 @@ namespace QuickLook.Web.Controllers
 
             if (take != 0 && page != 0)
             {
-                pagination = new Pagination()
+                pagination = new SearchPagination()
                 {
                     Take = take,
                     Page = page,
@@ -86,9 +86,9 @@ namespace QuickLook.Web.Controllers
             return pagination;
         }
 
-        protected Pagination CreatePagination(SearchContentDTO searchedContent)
+        protected SearchPagination CreatePagination(SearchContentDTO searchedContent)
         {
-            Pagination pagination = new Pagination()
+            SearchPagination pagination = new SearchPagination()
             {
                 Take = 10,
                 Page = 1,
@@ -100,7 +100,7 @@ namespace QuickLook.Web.Controllers
 
             if (take != 0 && page != 0)
             {
-                pagination = new Pagination()
+                pagination = new SearchPagination()
                 {
                     Take = take,
                     Page = page,

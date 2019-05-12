@@ -10,9 +10,9 @@ namespace QuickLook.WebApi.Controllers
 {
     public class BaseController : ControllerBase
     {
-        protected Pagination CreatePagination(int take, int page)
+        protected SearchPagination CreatePagination(int take, int page)
         {
-            Pagination pagination = new Pagination()
+            SearchPagination pagination = new SearchPagination()
             {
                 Take = take >= 0 ? take : 10,
                 Page = page > 0 ? page : 1,
@@ -22,7 +22,7 @@ namespace QuickLook.WebApi.Controllers
             return pagination;
         }
 
-        protected Pagination CreatePagination(SearchContentDTO searchedContent)
+        protected SearchPagination CreatePagination(SearchContentDTO searchedContent)
         {
             var take = searchedContent.Take ?? 10;
             var page = searchedContent.Page ?? 1;

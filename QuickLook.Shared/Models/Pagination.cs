@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Shared.Models
 {
-    public class Pagination
+    public class SearchPagination
     {
         public int Take { get; set; }
         public int Page { get; set; }

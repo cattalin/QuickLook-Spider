@@ -17,14 +17,14 @@ namespace QuickLook.WebApi.Controllers
         [HttpPost("advanced")]
         public IActionResult AdvancedResults(SearchContentDTO searchedContent)
         {
-            Pagination pagination = CreatePagination(searchedContent);
+            SearchPagination pagination = CreatePagination(searchedContent);
 
             ESOutputManager client = new ESOutputManager();
             var searchResult = client
                 .FullTextSearchAdvanced(searchedContent, pagination)
                 .ToDto(pagination, searchedContent);
 
-            if (searchResult.Hits.Count == 0)
+            if (searchResult.SearchHits.Count == 0)
             {
                 return NotFound();
             }
@@ -36,7 +36,7 @@ namespace QuickLook.WebApi.Controllers
         [ProducesResponseType(200)]
         public IActionResult Results([FromQuery] string searchedContent, [FromQuery] int take, [FromQuery] int page)
         {
-            Pagination pagination = CreatePagination(take, page);
+            SearchPagination pagination = CreatePagination(take, page);
 
             var searchedContentDto = new SearchContentDTO()
             {
@@ -50,7 +50,7 @@ namespace QuickLook.WebApi.Controllers
                 .FullTextSearch(searchedContent, pagination)
                 .ToDto(pagination, searchedContentDto);
 
-            if (searchResult.Hits.Count == 0)
+            if (searchResult.SearchHits.Count == 0)
             {
                 return NotFound();
             }

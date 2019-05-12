@@ -10,25 +10,25 @@ namespace Shared.DTOs
 {
     public static class NestToDtoMapper
     {
-        public static SearchResultDto ToDto(this ISearchResponse<WebsiteInfo> searchResponse, Pagination pagination, SearchContentDTO searchedContent)
+        public static SearchResultDto ToDto(this ISearchResponse<WebsiteInfo> searchResponse, SearchPagination pagination, SearchContentDTO searchedContent)
         {
 
             SearchResultDto result = new SearchResultDto
             {
-                Hits = searchResponse.Hits.ToDtos(),
+                SearchHits = searchResponse.Hits.ToDtos(),
                 SearchMetadata = new SearchMetadataDto
                 {
                     Took = searchResponse.Took,
                     Total = searchResponse.Total,
                     SearchedContent = searchedContent
                 },
-                Pagination = pagination
+                SearchPagination = pagination
             };
 
             return result;
         }
 
-        public static List<WebsiteInfoDto> ToDtos(this IReadOnlyCollection<Nest.IHit<WebsiteInfo>> Hits)
+        public static List<WebsiteInfoDto> ToDtos(this IReadOnlyCollection<IHit<WebsiteInfo>> Hits)
         {
             var results = new List<WebsiteInfoDto>();
 

@@ -52,7 +52,7 @@ namespace ElasticsearchService.OutputManagers
             client = new ElasticClient(settings);
         }
 
-        public List<WebsiteInfo> WilcardSearch(string searchedContent, Pagination pagination)
+        public List<WebsiteInfo> WilcardSearch(string searchedContent, SearchPagination pagination)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
@@ -92,7 +92,7 @@ namespace ElasticsearchService.OutputManagers
             return results.ToList();
         }
 
-        public ISearchResponse<WebsiteInfo> FullTextSearchAdvanced(SearchContentDTO searchContent, Pagination pagination)
+        public ISearchResponse<WebsiteInfo> FullTextSearchAdvanced(SearchContentDTO searchContent, SearchPagination pagination)
         {
 
             if (searchContent.MatchUncrawledWebsites)
@@ -131,7 +131,7 @@ namespace ElasticsearchService.OutputManagers
             return searchResult;
         }
 
-        public ISearchResponse<WebsiteInfo> FullTextSearchPendingWebsites(SearchContentDTO searchContent, Pagination pagination)
+        public ISearchResponse<WebsiteInfo> FullTextSearchPendingWebsites(SearchContentDTO searchContent, SearchPagination pagination)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .Index(Constants.PENDING_WEBSITES_INDEX)
@@ -156,7 +156,7 @@ namespace ElasticsearchService.OutputManagers
             return searchResult;
         }
 
-        public ISearchResponse<WebsiteInfo> FullTextSearch(string searchedContent, Pagination pagination)
+        public ISearchResponse<WebsiteInfo> FullTextSearch(string searchedContent, SearchPagination pagination)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .Index(Constants.VISITED_WEBSITES_INDEX)
@@ -207,7 +207,7 @@ namespace ElasticsearchService.OutputManagers
             return searchResult;
         }
 
-        public ISearchResponse<WebsiteInfo> FullTextSearchtest(string searchedContent, Pagination pagination)
+        public ISearchResponse<WebsiteInfo> FullTextSearchtest(string searchedContent, SearchPagination pagination)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .Index(Constants.VISITED_WEBSITES_INDEX)
@@ -232,7 +232,7 @@ namespace ElasticsearchService.OutputManagers
             return searchResult;
         }
 
-        public List<WebsiteInfo> GetWebsitesByUrl(string url, Pagination pagination)
+        public List<WebsiteInfo> GetWebsitesByUrl(string url, SearchPagination pagination)
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .AllIndices()

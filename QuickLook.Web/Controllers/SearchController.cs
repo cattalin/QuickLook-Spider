@@ -35,14 +35,14 @@ namespace QuickLook.Web.Controllers
         {
             ViewData["SearchedContent"] = searchedContent;
 
-            Pagination pagination = CreatePagination(searchedContent);
+            SearchPagination pagination = CreatePagination(searchedContent);
 
             ESOutputManager client = new ESOutputManager();
             var searchResult = client
                 .FullTextSearchAdvanced(searchedContent, pagination)
                 .ToDto(pagination, searchedContent);
 
-            if (searchResult.Hits.Count == 0)
+            if (searchResult.SearchHits.Count == 0)
             {
                 return View("NotFound");
             }
@@ -60,14 +60,14 @@ namespace QuickLook.Web.Controllers
 
             ViewData["SearchedContent"] = searchedContentDto;
 
-            Pagination pagination = CreatePagination(take, page);
+            SearchPagination pagination = CreatePagination(take, page);
 
             ESOutputManager client = new ESOutputManager();
             var searchResult = client
                 .FullTextSearch(searchedContent, pagination)
                 .ToDto(pagination, searchedContentDto);
 
-            if (searchResult.Hits.Count == 0)
+            if (searchResult.SearchHits.Count == 0)
             {
                 return View("NotFound");
             }

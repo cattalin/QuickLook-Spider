@@ -58,7 +58,17 @@ namespace QuickLook.WebApi
                 c.SwaggerEndpoint("/swagger", "Quicklook API");
             });
 
-            app.UseHttpsRedirection();
+            //app.UseSwagger(c =>
+            //{
+            //    c.RouteTemplate = "/api/swagger/{documentName}/swagger.json";
+            //});
+
+            //app.UseSwaggerUI(c =>
+            //{
+            //    c.SwaggerEndpoint("/api/swagger", "Quicklook API");
+            //    c.RoutePrefix = "/api/swagger";
+            //});
+            //app.UseHttpsRedirection();
             app.UseMvc();
         }
     }

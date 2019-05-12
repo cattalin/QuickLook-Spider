@@ -9,8 +9,10 @@ namespace Shared.DTOs
 {
     public class SearchResultDto
     {
-        public List<WebsiteInfoDto> Hits { get; set; }
+        public List<WebsiteInfoDto> SearchHits { get; set; }
+
         public SearchMetadataDto SearchMetadata { get; set; }
-        public Pagination Pagination { get; set; }
+
+        public SearchPagination SearchPagination { get; set; }
     }
 }
