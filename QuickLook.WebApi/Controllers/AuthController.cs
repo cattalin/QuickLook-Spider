@@ -11,6 +11,8 @@ using QuickLook.WebApi.Models;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
 
 namespace QuickLook.WebApi.Controllers
 {
@@ -18,10 +20,22 @@ namespace QuickLook.WebApi.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        ApplicationDbContext context;
-        public AuthController()
+        private IConfiguration _config;
+        private ApplicationDbContext context;
+
+        public AuthController(IConfiguration config)
         {
+            _config = config;
             context = new ApplicationDbContext();
+        }
+
+
+        [HttpGet]
+        [Route("test")]
+        [Authorize]
+        public IActionResult Test()
+        {
+            return Ok();
         }
 
         [HttpPost]
@@ -35,21 +49,29 @@ namespace QuickLook.WebApi.Controllers
 
             if (user.Username == entity.Username && HashPassword(user.Password, Convert.FromBase64String(entity.Salt)) == entity.PasswordHash)
             {
-                var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"));
+                var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
                 var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
-                var tokeOptions = new JwtSecurityToken(
+                var token = new JwtSecurityToken(
+                    _config["Jwt:Issuer"],
+                    _config["Jwt:Issuer"],
                     claims: new List<Claim>(),
-                    expires: DateTime.Now.AddMinutes(5),
+                    expires: DateTime.Now.AddDays(5),
                     signingCredentials: signinCredentials
                 );
 
-                var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
-                return Ok(new { Token = tokenString });
+                var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+                return Ok(new
+                {
+                    Token = tokenString,
+                    Username = user.Username,
+                    Email = entity.Email
+                });
             }
             else
             {
-                return Unauthorized();
+                return Unauthorized(new { Status = "Username or password is wrong" });
             }
         }
 
