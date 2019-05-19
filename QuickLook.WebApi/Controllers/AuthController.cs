@@ -42,10 +42,10 @@ namespace QuickLook.WebApi.Controllers
         [Route("login")]
         public IActionResult Login([FromBody][Required] LoginModel user)
         {
-            var entity = context.Users.First(u => u.Username == user.Username);
+            var entity = context.Users.FirstOrDefault(u => u.Username == user.Username);
 
             if (entity == null)
-                return BadRequest(new { Status = "Login Failed" });
+                return Unauthorized(new { Status = "Username or password is wrong" });
 
             if (user.Username == entity.Username && HashPassword(user.Password, Convert.FromBase64String(entity.Salt)) == entity.PasswordHash)
             {
