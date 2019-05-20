@@ -40,8 +40,11 @@ namespace QuickLook.WebApi.Controllers
 
         [HttpPost]
         [Route("login")]
-        public IActionResult Login([FromBody][Required] LoginModel user)
+        public IActionResult Login([FromBody] LoginModel user)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(new { Status = "Please complete all the fields" });
+
             var entity = context.Users.FirstOrDefault(u => u.Username == user.Username);
 
             if (entity == null)
@@ -64,6 +67,7 @@ namespace QuickLook.WebApi.Controllers
 
                 return Ok(new
                 {
+                    Status = "Successful login",
                     Token = tokenString,
                     Username = user.Username,
                     Email = entity.Email
@@ -79,6 +83,9 @@ namespace QuickLook.WebApi.Controllers
         [Route("register")]
         public IActionResult Register([FromBody]RegisterModel user)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(new { Status = "Please complete all the fields" });
+
             var exiting = context.Users.Any(u => u.Username == user.Username || u.Email == user.Email);
 
             if (exiting)
