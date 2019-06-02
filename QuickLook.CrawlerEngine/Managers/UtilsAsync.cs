@@ -71,8 +71,8 @@ namespace Spider.Managers
         {
             htmlDoc.DocumentNode.Descendants()
                    .Where(n => n.Name == "script" || n.Name == "style")
-                   .ToList()
-                   .ForEach(n => n.Remove());
+                   ?.ToList()
+                   ?.ForEach(n => n.Remove());
 
             var _title = htmlDoc.DocumentNode.SelectSingleNode("//head//title");
             var title = _title?.InnerHtml;
@@ -105,13 +105,16 @@ namespace Spider.Managers
                                       ?.FirstOrDefault()
                                       ?.Value;
 
+            string _headers = "//*[starts-with(name(),'h') and string-length(name()) = 2 and number(substring(name(), 2)) <= 6]";
+            var headers = htmlDoc.DocumentNode.SelectNodes(_headers)?.Select(p => SanitizeIrrelevantContent(WebUtility.HtmlDecode(p.InnerText)));
+
             var _page = htmlDoc.DocumentNode.SelectSingleNode("//body");
+
             var _paragraphs = _page.SelectNodes("//p");
+            var paragraphs = _paragraphs?.Select(p => SanitizeIrrelevantContent(WebUtility.HtmlDecode(p.InnerText)));
+            //paragraphs.ToList().ForEach(p => SanitizeIrrelevantContent(p));
 
-            var paragraphs = _paragraphs
-                ?.Select(p => WebUtility.HtmlDecode(p.InnerText));
-
-            var fullPage = SanitizeIrrelevantContent(_page.InnerText);
+            var fullPage = _page.InnerText;
 
             return new WebsiteInfo
             {
@@ -119,8 +122,9 @@ namespace Spider.Managers
                 Url = url,
                 Title = title,
                 DescriptionMeta = description,
-                Paragraphs = paragraphs.ToList(),
-                FullPageContent = fullPage,
+                Paragraphs = paragraphs?.ToList(),
+                Headers = headers?.ToList(),
+                FullPageContent = SanitizeIrrelevantContent(fullPage),
                 Language = _language,
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now
@@ -130,6 +134,11 @@ namespace Spider.Managers
         static public string SanitizeIrrelevantContent(string htmlContent)
         {
             var result = htmlContent;
+
+            if (result == null || result == "")
+            {
+                return "";
+            }
 
             result = Regex.Replace(result, @"\b\w{1,2}\b", "");//remove 1 letter words
             result = Regex.Replace(result, @"\s+", " ");       //remove newlines tabs and whitespaces
@@ -146,15 +155,14 @@ namespace Spider.Managers
             {
                 int hrefAttributeIndex = r.Attributes
                     .Select(attr => attr.Name)
-                    .ToList()
-                    .IndexOf("href");
+                    ?.ToList()
+                    .IndexOf("href")??-1;
                 if (hrefAttributeIndex != -1)
                 {
                     return r.Attributes[hrefAttributeIndex].Value;
                 }
 
                 return null;
-
             });
 
 
@@ -162,7 +170,7 @@ namespace Spider.Managers
 
             List<string> relatedWebsitesUrls = new List<string>();
 
-            _hrefs.ToList().ForEach(_href =>
+            _hrefs?.ToList().ForEach(_href =>
             {
                 var sanitizedReference = _href.Split('#').First();
 

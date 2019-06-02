@@ -31,7 +31,7 @@ namespace Spider.Managers
         public async Task StartCrawlingAsync(List<string> urlSeeds)
         {
             await StartCrawlThreadsAsync();
-//            await PeriodicCrawlAsync(new TimeSpan(0, 0, 1), new CancellationToken(false));
+            //            await PeriodicCrawlAsync(new TimeSpan(0, 0, 1), new CancellationToken(false));
         }
 
         public async Task PeriodicCrawlAsync(TimeSpan interval, CancellationToken cancellationToken)
@@ -39,7 +39,7 @@ namespace Spider.Managers
             while (true)
             {
                 await CrawlBatch();
-//                await Task.Delay(interval, cancellationToken);
+                //                await Task.Delay(interval, cancellationToken);
             }
         }
 
@@ -48,11 +48,11 @@ namespace Spider.Managers
             Stopwatch stopwatch = Stopwatch.StartNew();
             Console.WriteLine("STARTED_BATCH");
 
-//            await Task.Run(() =>
-//            {
-//                Parallel.ForEach(pendingWebsites.GetNextPendingBatchRandomNest(Constants.BATCH_SIZE),
-//                    pendingWeb => { ParseWebsiteAsync(pendingWeb.Url); });
-//            });
+            //            await Task.Run(() =>
+            //            {
+            //                Parallel.ForEach(pendingWebsites.GetNextPendingBatchRandomNest(Constants.BATCH_SIZE),
+            //                    pendingWeb => { ParseWebsiteAsync(pendingWeb.Url); });
+            //            });
 
             List<Task> tasks = new List<Task>();
             pendingWebsites.GetNextPendingBatchRandomNest(Constants.BATCH_SIZE).ForEach(async pendingWeb =>
@@ -71,7 +71,7 @@ namespace Spider.Managers
             Stopwatch stopwatch = Stopwatch.StartNew();
             Console.WriteLine("STARTED_BATCH");
 
-            for(var i = 0; i < Constants.BATCH_SIZE; i++)
+            for (var i = 0; i < Constants.BATCH_SIZE; i++)
             {
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 Task.Run(async () =>
@@ -104,22 +104,19 @@ namespace Spider.Managers
 
                 var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(currentUrl, htmlDoc);
 
-                await this.crawledWebsites.OutputEntryAsync(retrievedInfo, retrievedInfo.Id);
+                await crawledWebsites.OutputEntryAsync(retrievedInfo, retrievedInfo.Id);
 
                 var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
-                var pendingWebsites = Utils.ConvertUrlsToModelList(relatedWebsiteUrls);
-
-                await this.pendingWebsites.BulkOutputAsync(pendingWebsites);
+                //var pendingWebsites = Utils.ConvertUrlsToModelList(relatedWebsiteUrls);
+                //await this.pendingWebsites.BulkOutputAsync(pendingWebsites);
 
                 stopwatch.Stop();
 
-                Console.WriteLine(
-                    $@"Time Elapsed: {stopwatch.ElapsedMilliseconds} for crawling {currentUrl} with another {relatedWebsiteUrls.Count} referenced websites.");
-
+                Console.WriteLine($@"Time Elapsed: {stopwatch.ElapsedMilliseconds} for crawling {currentUrl} with another {relatedWebsiteUrls.Count} referenced websites.");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Console.WriteLine("Untreated error appeared. Skipping ---> " + currentUrl);
+                Console.WriteLine($"Untreated error appeared. Skipping ---> {currentUrl} --- {ex.Message}");
             }
         }
 
@@ -144,7 +141,6 @@ namespace Spider.Managers
                     await crawledWebsites.OutputEntryAsync(retrievedInfo);
 
                     var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
-
 
 
                     stopwatch.Stop();

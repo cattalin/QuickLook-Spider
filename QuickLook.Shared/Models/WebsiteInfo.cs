@@ -16,6 +16,8 @@ namespace Shared.Models
 
         public List<string> Paragraphs { get; set; }
 
+        public List<string> Headers { get; set; }
+
         public string FullPageContent { get; set; }
 
         public string Language { get; set; }
