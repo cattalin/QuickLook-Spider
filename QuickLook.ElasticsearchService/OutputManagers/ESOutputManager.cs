@@ -94,40 +94,36 @@ namespace ElasticsearchService.OutputManagers
 
         public ISearchResponse<WebsiteInfo> FullTextSearchAdvanced(SearchContentDTO searchContent, SearchPagination pagination)
         {
-
             if (searchContent.MatchUncrawledWebsites)
             {
                 return FullTextSearchPendingWebsites(searchContent, pagination);
             }
 
             var searchResult = client.Search<WebsiteInfo>(s => s
-                        .Index( Constants.VISITED_WEBSITES_INDEX)
-                        .Type(mapping)
-                        .From(pagination.From)
-                        .Size(pagination.Take)
-                        .Query(q => q
-                                .Bool(b => b
-                                        .Must(
-                                            m => m.MultiMatch(w => w
-                                                .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
-                                                .Query(searchContent.Input)
-                                                .Fuzziness(Fuzziness.EditDistance(searchContent.Fuzziness)))
-                                            , m => m.Term(t => t.Language, searchContent.Language)
-                                                , m => m.DateRange(t => 
-                                                    t.Field(f => f.CreateDate)
-                                                        .GreaterThanOrEquals(searchContent.StartDate)
-                                                        .LessThanOrEquals(searchContent.EndDate)
-                                                )
-                                        )
+                    .Index(Constants.VISITED_WEBSITES_INDEX)
+                    .Type(mapping)
+                    .From(pagination.From)
+                    .Size(pagination.Take)
+                    .Query(q => q
+                        .Bool(b => b
+                            .Must(
+                                m => m.MultiMatch(w => w
+                                    .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
+                                    .Query(searchContent.Input)
+                                    .Fuzziness(Fuzziness.EditDistance(searchContent.Fuzziness)))
+                                , m => m.Term(t => t.Language, searchContent.Language)
+                                    , m => m.DateRange(t =>
+                                        t.Field(f => f.CreateDate)
+                                            .GreaterThanOrEquals(searchContent.StartDate)
+                                            .LessThanOrEquals(searchContent.EndDate)
+                                    )
                                 )
+                            )
                         )
-                        .Highlight(h => h.PreTags("<b>").PostTags("</b>")
-                            .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
-                        )
-
+                    .Highlight(h => h.PreTags("<b>").PostTags("</b>")
+                        .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
                     )
-                ;
-
+                );
             return searchResult;
         }
 
@@ -172,13 +168,12 @@ namespace ElasticsearchService.OutputManagers
                                 .Fuzziness(Fuzziness.EditDistance(2)))
                             , m => m.Term(t => t.Language, "en")
                             )
-//                        .Should(m => m.Term(t => t.Language, "en"))
+                    //                        .Should(m => m.Term(t => t.Language, "en"))
                     )
                 )
                 .Highlight(h => h.PreTags("<b>").PostTags("</b>")
                     .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
                 )
-
             );
 
             return searchResult;
@@ -226,7 +221,6 @@ namespace ElasticsearchService.OutputManagers
                 .Highlight(h => h.PreTags("<b>").PostTags("</b>")
                     .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs"))
                 )
-
             );
 
             return searchResult;

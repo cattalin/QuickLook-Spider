@@ -19,6 +19,7 @@ namespace Spider.Managers
     {
         private ESWebsitesInputManager crawledWebsites;
         private ESPendingWebsitesInputManager pendingWebsites;
+        private ESSuggestionsInputManager suggestions;
 
         private List<Task> crawlTasks = new List<Task>();
 
@@ -109,6 +110,8 @@ namespace Spider.Managers
                 var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
                 //var pendingWebsites = Utils.ConvertUrlsToModelList(relatedWebsiteUrls);
                 //await this.pendingWebsites.BulkOutputAsync(pendingWebsites);
+
+                await suggestions.BulkOutputAsync(retrievedInfo);
 
                 stopwatch.Stop();
 
