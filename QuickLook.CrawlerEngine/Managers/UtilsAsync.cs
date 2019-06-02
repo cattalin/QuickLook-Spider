@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Shared.Models;
@@ -68,6 +69,11 @@ namespace Spider.Managers
 
         static public async Task<WebsiteInfo> RetrieveWebsiteInfoAsync(string url, HtmlDocument htmlDoc)
         {
+            htmlDoc.DocumentNode.Descendants()
+                   .Where(n => n.Name == "script" || n.Name == "style")
+                   .ToList()
+                   .ForEach(n => n.Remove());
+
             var _title = htmlDoc.DocumentNode.SelectSingleNode("//head//title");
             var title = _title?.InnerHtml;
 
@@ -105,7 +111,7 @@ namespace Spider.Managers
             var paragraphs = _paragraphs
                 ?.Select(p => WebUtility.HtmlDecode(p.InnerText));
 
-            var fullPage = _page.InnerText;
+            var fullPage = SanitizeIrrelevantContent(_page.InnerText);
 
             return new WebsiteInfo
             {
@@ -121,8 +127,20 @@ namespace Spider.Managers
             };
         }
 
+        static public string SanitizeIrrelevantContent(string htmlContent)
+        {
+            var result = htmlContent;
+
+            result = Regex.Replace(result, @"\b\w{1,2}\b", "");//remove 1 letter words
+            result = Regex.Replace(result, @"\s+", " ");       //remove newlines tabs and whitespaces
+
+            return result;
+        }
+
         static public async Task<List<string>> RetrieveRelatedWebsitesUrlsAsync(string url, HtmlDocument htmlDoc)
         {
+            var sanitizedUrl = url.Split('#').First();
+
             var _refs = htmlDoc.DocumentNode.SelectNodes("//a[@href]");
             var _hrefs = _refs?.Select(r =>
             {
@@ -146,23 +164,30 @@ namespace Spider.Managers
 
             _hrefs.ToList().ForEach(_href =>
             {
-                if (_href.StartsWith("http"))
+                var sanitizedReference = _href.Split('#').First();
+
+                if (sanitizedReference.Equals(sanitizedUrl))
                 {
-                    relatedWebsitesUrls.Add(_href);
+                    return;
                 }
-                else if (_href.StartsWith("//"))
+
+                if (sanitizedReference.StartsWith("http"))
                 {
-                    relatedWebsitesUrls.Add(baseUrl.Scheme + ":" + _href);
+                    relatedWebsitesUrls.Add(sanitizedReference);
                 }
-                else if (_href.StartsWith("/"))
+                else if (sanitizedReference.StartsWith("//"))
                 {
-                    relatedWebsitesUrls.Add(baseUrl.Scheme + "://" + baseUrl.Host + _href);
+                    relatedWebsitesUrls.Add(baseUrl.Scheme + ":" + sanitizedReference);
                 }
-                else if (_href.StartsWith("./"))
+                else if (sanitizedReference.StartsWith("/"))
+                {
+                    relatedWebsitesUrls.Add(baseUrl.Scheme + "://" + baseUrl.Host + sanitizedReference);
+                }
+                else if (sanitizedReference.StartsWith("./"))
                 {
 
                 }
-                else if (_href.StartsWith("#"))
+                else if (sanitizedReference.StartsWith("#"))
                 {
 
                 }
