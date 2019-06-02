@@ -8,12 +8,13 @@ using Shared.Interfaces;
 
 namespace ElasticsearchService.OutputManagers
 {
-    public class ESInputManager<T> : IDisposable, IOutputManager<T>
+    public class ESInputManager<T> : IOutputManager<T>, IDisposable 
     {
         private ConnectionConfiguration settings;
         protected ElasticLowLevelClient lowlevelClient;
 
         protected string index = Constants.VISITED_WEBSITES_INDEX;
+        protected string mapping = Constants.DEFAULT_MAPPING_TYPE;
 
         public ESInputManager()
         {
@@ -25,20 +26,26 @@ namespace ElasticsearchService.OutputManagers
 
         public void OutputEntry(T retrievedInfo)
         {
-            var indexResponse = lowlevelClient.Index<BytesResponse>(index, "_doc", PostData.Serializable(retrievedInfo));
-            byte[] responseBytes = indexResponse.Body;
+            var indexResponse = lowlevelClient.Index<BytesResponse>(index, mapping, PostData.Serializable(retrievedInfo));
+            var response = indexResponse.Body;
         }
 
         public async Task OutputEntryAsync(T retrievedInfo)
         {
-            var asyncIndexResponse = await lowlevelClient.IndexAsync<StringResponse>(index, "_doc", PostData.Serializable(retrievedInfo));
-            string responseString = asyncIndexResponse.Body;
+            var asyncIndexResponse = await lowlevelClient.IndexAsync<StringResponse>(index, mapping, PostData.Serializable(retrievedInfo));
+            var response = asyncIndexResponse.Body;
         }
 
         public async Task OutputEntryAsync(T retrievedInfo, string Id)
         {
-            var asyncIndexResponse = await lowlevelClient.IndexAsync<StringResponse>(index, "_doc", Id, PostData.Serializable(retrievedInfo));
-            string responseString = asyncIndexResponse.Body;
+            var asyncIndexResponse = await lowlevelClient.IndexAsync<StringResponse>(index, mapping, Id, PostData.Serializable(retrievedInfo));
+            var response = asyncIndexResponse.Body;
+        }
+
+        public async Task UpdateEntryAsync(T retrievedInfo, string Id)
+        {
+            var asyncIndexResponse = await lowlevelClient.UpdateAsync<StringResponse>(index, mapping, Id, PostData.Serializable(new { doc = retrievedInfo }));
+            var response = asyncIndexResponse.Body;
         }
 
         public async Task BulkOutputAsync(List<PendingWebsite> items)
@@ -60,24 +67,12 @@ namespace ElasticsearchService.OutputManagers
             });
 
             var indexResponse = await lowlevelClient.BulkAsync<StringResponse>(PostData.MultiJson(data));
-            string responseString = indexResponse.Body;
-        }
-
-        public void UpdateEntry(T retrievedInfo, string Id)
-        {
-            var asyncIndexResponse = lowlevelClient.Update<StringResponse>(index, "_doc", Id, PostData.Serializable(new { doc = retrievedInfo }));
-            string responseString = asyncIndexResponse.Body;
-        }
-
-        public async Task UpdateEntryAsync(T retrievedInfo, string Id)
-        {
-            var asyncIndexResponse = await lowlevelClient.UpdateAsync<StringResponse>(index, "_doc", Id, PostData.Serializable(new { doc = retrievedInfo }));
-            string responseString = asyncIndexResponse.Body;
+            var response = indexResponse.Body;
         }
 
         public void Search()
         {
-            var searchResponse = lowlevelClient.Search<StringResponse>(index, "_doc", PostData.Serializable(new
+            var searchResponse = lowlevelClient.Search<StringResponse>(index, mapping, PostData.Serializable(new
             {
                 from = 0,
                 size = 10,

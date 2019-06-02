@@ -20,12 +20,12 @@ namespace ElasticsearchService.OutputManagers
         : base()
         {
             rr = new Random();
-            this.index = Constants.PENDING_WEBSITES_INDEX;
+            index = Constants.PENDING_WEBSITES_INDEX;
             settings = new ConnectionSettings(new Uri(Constants.ELASTICSEARCH_URL))
                 .DefaultIndex(index)
                 .DefaultMappingFor<PendingWebsite>(i => i
                     .IndexName(index)
-                    .TypeName("_doc")
+                    .TypeName(mapping)
                 );
 
             client = new ElasticClient(settings);
@@ -33,8 +33,7 @@ namespace ElasticsearchService.OutputManagers
 
         public List<PendingWebsite> GetNextPendingBatchRandom(int BATCH_SIZE)
         {
-
-            var searchResponse = lowlevelClient.Search<StringResponse>(index, "_doc", PostData.Serializable(new
+            var searchResponse = lowlevelClient.Search<StringResponse>(index, mapping, PostData.Serializable(new
             {
                 size = BATCH_SIZE,
                 query = new

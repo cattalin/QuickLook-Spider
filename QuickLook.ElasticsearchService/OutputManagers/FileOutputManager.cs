@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -7,7 +8,7 @@ using Shared.Models;
 
 namespace ElasticsearchService.OutputManagers
 {
-    public class FileOutputManager : IDisposable, IOutputManager<WebsiteInfo>
+    public class FileOutputManager : IOutputManager<WebsiteInfo>, IDisposable
     {
         private readonly StreamWriter _streamWriter;
         private readonly JsonSerializer _serializer;
@@ -49,6 +50,10 @@ namespace ElasticsearchService.OutputManagers
 
 
             await Task.Run(() => _serializer.Serialize(_streamWriter, retrievedInfo));
+        }
+        public Task BulkOutputAsync(List<PendingWebsite> items)
+        {
+            throw new NotImplementedException();
         }
 
         public bool isDisposed = false;

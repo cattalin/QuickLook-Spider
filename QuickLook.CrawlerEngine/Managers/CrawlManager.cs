@@ -73,14 +73,13 @@ namespace Spider.Managers
 
             for(var i = 0; i < Constants.BATCH_SIZE; i++)
             {
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 Task.Run(async () =>
                 {
-//                    Console.WriteLine($"1");
                     while (true)
                     {
                         try
                         {
-
                             var pendingWebsite = pendingWebsites.GetNextPendingBatchRandomNest(1).First();
                             await ParseWebsiteAsync(pendingWebsite.Url);
                         }
@@ -88,10 +87,6 @@ namespace Spider.Managers
                         {
                             Console.WriteLine(Ex.Message);
                         }
-//                        Console.WriteLine($"STARTED_THREAD {i}");
-
-
-//                        Console.WriteLine($"ENDED_THREAD {i}");
                     }
                 });
             }
@@ -130,7 +125,7 @@ namespace Spider.Managers
 
         public async Task ParseWebsiteRecursivelyAsync(string currentUrl)
         {
-            if (!CrawlStatusManager.IsWebsiteRecentlyIndexed(currentUrl))//remove all these contains. elasticsearch should handle those
+            if (!CrawlStatusManager.IsWebsiteRecentlyIndexed(currentUrl))
             {
                 try
                 {

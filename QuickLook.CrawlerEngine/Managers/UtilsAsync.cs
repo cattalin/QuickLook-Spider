@@ -123,7 +123,6 @@ namespace Spider.Managers
 
         static public async Task<List<string>> RetrieveRelatedWebsitesUrlsAsync(string url, HtmlDocument htmlDoc)
         {
-
             var _refs = htmlDoc.DocumentNode.SelectNodes("//a[@href]");
             var _hrefs = _refs?.Select(r =>
             {
@@ -131,7 +130,7 @@ namespace Spider.Managers
                     .Select(attr => attr.Name)
                     .ToList()
                     .IndexOf("href");
-                if (hrefAttributeIndex != null && hrefAttributeIndex != -1)
+                if (hrefAttributeIndex != -1)
                 {
                     return r.Attributes[hrefAttributeIndex].Value;
                 }

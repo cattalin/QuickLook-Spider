@@ -11,7 +11,7 @@ namespace ElasticsearchService.OutputManagers
     {
         public ESWebsitesInputManager()
         {
-            this.index = "websites";
+            index = "websites";
         }
     }
 }

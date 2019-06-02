@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Shared;
 using Shared.Models;
-using System.Diagnostics;
 using Shared.DTOs;
 
 namespace ElasticsearchService.OutputManagers
@@ -18,10 +17,11 @@ namespace ElasticsearchService.OutputManagers
         private ElasticClient client;
 
         private string index = Constants.VISITED_WEBSITES_INDEX;
+        protected string mapping = Constants.DEFAULT_MAPPING_TYPE;
 
         public ESOutputManager()
         {
-            settings = new ConnectionSettings(new Uri("http://localhost:9200"))
+            settings = new ConnectionSettings(new Uri(Constants.ELASTICSEARCH_URL))
                 .DefaultFieldNameInferrer(d => { return d.First().ToString().ToUpper() + d.Substring(1); })
                 .EnableDebugMode(response =>
                 {
@@ -56,7 +56,7 @@ namespace ElasticsearchService.OutputManagers
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
-                .Type("_doc")
+                .Type(mapping)
                 .From(pagination.From)
                 .Size(pagination.Take)
                 .Query(q => q
@@ -102,7 +102,7 @@ namespace ElasticsearchService.OutputManagers
 
             var searchResult = client.Search<WebsiteInfo>(s => s
                         .Index( Constants.VISITED_WEBSITES_INDEX)
-                        .Type("_doc")
+                        .Type(mapping)
                         .From(pagination.From)
                         .Size(pagination.Take)
                         .Query(q => q
@@ -135,7 +135,7 @@ namespace ElasticsearchService.OutputManagers
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .Index(Constants.PENDING_WEBSITES_INDEX)
-                .Type("_doc")
+                .Type(mapping)
                 .From(pagination.From)
                 .Size(pagination.Take)
                 .Query(q => q
@@ -160,7 +160,7 @@ namespace ElasticsearchService.OutputManagers
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .Index(Constants.VISITED_WEBSITES_INDEX)
-                .Type("_doc")
+                .Type(mapping)
                 .From(pagination.From)
                 .Size(pagination.Take)
                 .Query(q => q
@@ -188,7 +188,7 @@ namespace ElasticsearchService.OutputManagers
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .AllIndices()
-                .Type("_doc")
+                .Type(mapping)
                 .From(0)
                 .Size(15)
                 .Query(q => q
@@ -211,7 +211,7 @@ namespace ElasticsearchService.OutputManagers
         {
             var searchResult = client.Search<WebsiteInfo>(s => s
                 .Index(Constants.VISITED_WEBSITES_INDEX)
-                .Type("_doc")
+                .Type(mapping)
                 .From(pagination.From)
                 .Size(pagination.Take)
                 .Query(q =>
@@ -271,11 +271,5 @@ namespace ElasticsearchService.OutputManagers
 
             return results.ToList();
         }
-
-        public string ToJson(IResponse response)
-        {
-            return Encoding.UTF8.GetString(response.ApiCall.RequestBodyInBytes);
-        }
-
     }
 }
