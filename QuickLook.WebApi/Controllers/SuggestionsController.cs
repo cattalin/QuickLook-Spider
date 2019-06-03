@@ -17,16 +17,17 @@ namespace QuickLook.WebApi.Controllers
         public IActionResult Suggestions(string searchedContent)
         {
             ESOutputManager client = new ESOutputManager();
-            var searchResult = client
-                .FullTextSearchAdvanced(searchedContent, pagination)
-                .ToDto(pagination, searchedContent);
+            //var searchResult = client
+            //    .FullTextSearchAdvanced(searchedContent, pagination)
+            //    .ToDto(pagination, searchedContent);
 
-            if (searchResult.SearchHits.Count == 0)
-            {
-                return NotFound();
-            }
+            //if (searchResult.SearchHits.Count == 0)
+            //{
+            //    return NotFound();
+            //}
 
-            return Ok(searchResult);
+            //return Ok(searchResult);
+            return Ok();
         }
     }
 }

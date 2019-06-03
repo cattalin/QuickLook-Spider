@@ -15,6 +15,7 @@ namespace QuickLook.WebApi.Controllers
     public class SearchController : BaseController
     {
         [HttpPost("advanced")]
+        [ProducesResponseType(200)]
         public IActionResult AdvancedResults(SearchContentDTO searchedContent)
         {
             SearchPagination pagination = CreatePagination(searchedContent);
@@ -23,11 +24,6 @@ namespace QuickLook.WebApi.Controllers
             var searchResult = client
                 .FullTextSearchAdvanced(searchedContent, pagination)
                 .ToDto(pagination, searchedContent);
-
-            if (searchResult.SearchHits.Count == 0)
-            {
-                return NotFound();
-            }
 
             return Ok(searchResult);
         }
@@ -49,11 +45,6 @@ namespace QuickLook.WebApi.Controllers
             var searchResult = client
                 .FullTextSearch(searchedContent, pagination)
                 .ToDto(pagination, searchedContentDto);
-
-            if (searchResult.SearchHits.Count == 0)
-            {
-                return NotFound();
-            }
 
             return Ok(searchResult);
         }
