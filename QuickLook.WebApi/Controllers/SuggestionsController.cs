@@ -13,20 +13,32 @@ namespace QuickLook.WebApi.Controllers
     [ApiController]
     public class SuggestionsController : BaseController
     {
-        [HttpGet]
-        public IActionResult Suggestions(string searchedContent)
+        [HttpGet("edge-ngram")]
+        public IActionResult EdgeNGram(string searchedContent)
+        {
+            ESSuggestionsOutputManager client = new ESSuggestionsOutputManager();
+            var searchResult = client
+                .EdgeNGramSearch(searchedContent);
+
+            return Ok(searchResult.Documents);
+        }
+
+        [HttpGet("completion")]
+        public IActionResult CompletionSuggester(string searchedContent)
+        {
+            ESSuggestionsOutputManager client = new ESSuggestionsOutputManager();
+            var searchResult = client
+                .CompletionSuggesterSearch(searchedContent);
+
+            var results = searchResult.Suggest.FirstOrDefault().Value.FirstOrDefault().Options?.Select(s => new { Suggestion = s.Text });
+            return Ok(results);
+        }
+
+        [HttpPost]
+        public IActionResult AddSuggestion(string content)
         {
             ESOutputManager client = new ESOutputManager();
-            //var searchResult = client
-            //    .FullTextSearchAdvanced(searchedContent, pagination)
-            //    .ToDto(pagination, searchedContent);
-
-            //if (searchResult.SearchHits.Count == 0)
-            //{
-            //    return NotFound();
-            //}
-
-            //return Ok(searchResult);
+            
             return Ok();
         }
     }

@@ -145,7 +145,7 @@ namespace ElasticsearchService.OutputManagers
                     )
                 )
                 .Highlight(h => h.PreTags("<b>").PostTags("</b>")
-                    .Fields(f => f.Field("Url"))
+                .Fields(f => f.Field("Url"))
                 )
             );
 
