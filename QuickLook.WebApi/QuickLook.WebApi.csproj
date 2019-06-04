@@ -20,12 +20,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\QuickLook.ElasticsearchService\QuickLook.ElasticsearchService.csproj" />
+    <ProjectReference Include="..\QuickLook.RelationalDbService\QuickLook.RelationalDbService.csproj" />
     <ProjectReference Include="..\QuickLook.Shared\QuickLook.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Entities\" />
-    <Folder Include="Migrations\" />
     <Folder Include="Models\" />
   </ItemGroup>
 

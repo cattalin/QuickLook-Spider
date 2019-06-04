@@ -13,7 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using QuickLook.WebApi.Entities;
+using QuickLook.RelationalDbService.Entities;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace QuickLook.WebApi

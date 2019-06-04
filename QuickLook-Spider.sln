@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickLook.Shared", "QuickLo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickLook.ElasticsearchService", "QuickLook.ElasticsearchService\QuickLook.ElasticsearchService.csproj", "{E60FE663-EB2B-4767-90A1-6237B2949E36}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickLook.WebApi", "QuickLook.WebApi\QuickLook.WebApi.csproj", "{5916B6A8-DF38-433C-9872-66CA705083BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickLook.WebApi", "QuickLook.WebApi\QuickLook.WebApi.csproj", "{5916B6A8-DF38-433C-9872-66CA705083BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickLook.RelationalDbService", "QuickLook.RelationalDbService\QuickLook.RelationalDbService.csproj", "{18F9A42F-CE06-44BB-9541-2871D2F406EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{5916B6A8-DF38-433C-9872-66CA705083BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5916B6A8-DF38-433C-9872-66CA705083BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5916B6A8-DF38-433C-9872-66CA705083BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18F9A42F-CE06-44BB-9541-2871D2F406EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18F9A42F-CE06-44BB-9541-2871D2F406EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18F9A42F-CE06-44BB-9541-2871D2F406EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18F9A42F-CE06-44BB-9541-2871D2F406EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace QuickLook.WebApi.Entities
+namespace QuickLook.RelationalDbService.Entities
 {
     public class ApplicationDbContext : DbContext
     {
@@ -15,8 +15,7 @@ namespace QuickLook.WebApi.Entities
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-
-            optionsBuilder.UseMySql("Server=localhost;User Id=root;Password=poftimparolapelocal;Database=QuickLook");
+            optionsBuilder.UseMySql("Server=localhost;User Id=root;Password=poftimparolapelocal;Database=QuickLook", b => b.MigrationsAssembly("QuickLook.WebApi"));
             base.OnConfiguring(optionsBuilder);
         }
 
@@ -34,6 +33,14 @@ namespace QuickLook.WebApi.Entities
                 entity.HasAlternateKey(e => e.Username);
                 entity.HasAlternateKey(e => e.Email);
                 entity.ToTable("User");
+            });
+
+            modelBuilder.Entity<Bookmark>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.ToTable("Bookmark");
+                entity.HasOne(b => b.User)
+                      .WithMany(u => u.Bookmarks);
             });
         }
     }

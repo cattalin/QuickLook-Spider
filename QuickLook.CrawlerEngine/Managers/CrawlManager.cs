@@ -111,7 +111,7 @@ namespace Spider.Managers
                 //var pendingWebsites = Utils.ConvertUrlsToModelList(relatedWebsiteUrls);
                 //await this.pendingWebsites.BulkOutputAsync(pendingWebsites);
 
-                await suggestions.BulkOutputAsync(retrievedInfo);
+                //await suggestions.BulkOutputAsync(retrievedInfo);
 
                 stopwatch.Stop();
 
