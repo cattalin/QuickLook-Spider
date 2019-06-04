@@ -29,15 +29,6 @@ namespace QuickLook.WebApi.Controllers
             context = new ApplicationDbContext();
         }
 
-
-        [HttpGet]
-        [Route("test")]
-        [Authorize]
-        public IActionResult Test()
-        {
-            return Ok();
-        }
-
         [HttpPost]
         [Route("login")]
         public IActionResult Login([FromBody] LoginModel user)
@@ -52,13 +43,19 @@ namespace QuickLook.WebApi.Controllers
 
             if (user.Username == entity.Username && HashPassword(user.Password, Convert.FromBase64String(entity.Salt)) == entity.PasswordHash)
             {
+
+                var basicUserClaims = new List<Claim>()
+                {
+                    new Claim("UserId", entity.Id)
+                };
+
                 var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
                 var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
                 var token = new JwtSecurityToken(
                     _config["Jwt:Issuer"],
                     _config["Jwt:Issuer"],
-                    claims: new List<Claim>(),
+                    claims: basicUserClaims,
                     expires: DateTime.Now.AddDays(5),
                     signingCredentials: signinCredentials
                 );
