@@ -16,7 +16,7 @@ namespace QuickLook.WebApi.Controllers
         [HttpGet("edge-ngram")]
         public IActionResult EdgeNGram(string searchedContent)
         {
-            ESSuggestionsOutputManager client = new ESSuggestionsOutputManager();
+            ESReadSuggestionsManager client = new ESReadSuggestionsManager();
             var searchResult = client
                 .EdgeNGramSearch(searchedContent);
 
@@ -26,7 +26,7 @@ namespace QuickLook.WebApi.Controllers
         [HttpGet("completion")]
         public IActionResult CompletionSuggester(string searchedContent)
         {
-            ESSuggestionsOutputManager client = new ESSuggestionsOutputManager();
+            ESReadSuggestionsManager client = new ESReadSuggestionsManager();
             var searchResult = client
                 .CompletionSuggesterSearch(searchedContent);
 
@@ -37,7 +37,7 @@ namespace QuickLook.WebApi.Controllers
         [HttpPost]
         public IActionResult AddSuggestion(string content)
         {
-            ESOutputManager client = new ESOutputManager();
+            ESReadWebsitesManager client = new ESReadWebsitesManager();
             
             return Ok();
         }

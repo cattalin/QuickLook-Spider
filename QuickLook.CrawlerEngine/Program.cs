@@ -23,8 +23,8 @@ namespace Spider
             CrawlStatusManager.Init();
             CrawlStatusManager.AddPendingWebsites(urlList);
 
-            ESWebsitesInputManager crawledWebsites = new ESWebsitesInputManager();
-            ESPendingWebsitesInputManager pendingWebsites = new ESPendingWebsitesInputManager();
+            ESWriteWebsitesManager crawledWebsites = new ESWriteWebsitesManager();
+            ESWritePendingWebsitesManager pendingWebsites = new ESWritePendingWebsitesManager();
 
             CrawlManager crawlManager = new CrawlManager(crawledWebsites, pendingWebsites);
             

@@ -7,9 +7,9 @@ using Shared.Models;
 
 namespace ElasticsearchService.OutputManagers
 {
-    public class ESWebsitesInputManager : ESInputManager<WebsiteInfo>
+    public class ESWriteWebsitesManager : ESWriteManager<WebsiteInfo>
     {
-        public ESWebsitesInputManager()
+        public ESWriteWebsitesManager()
         {
             index = "websites";
         }

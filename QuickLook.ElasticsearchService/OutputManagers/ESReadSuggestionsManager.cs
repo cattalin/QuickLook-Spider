@@ -12,7 +12,7 @@ using QuickLook.Shared.Models;
 
 namespace ElasticsearchService.OutputManagers
 {
-    public class ESSuggestionsOutputManager
+    public class ESReadSuggestionsManager
     {
         private ConnectionSettings settings;
         private ElasticClient client;
@@ -20,7 +20,7 @@ namespace ElasticsearchService.OutputManagers
         private string index = Constants.SEARCH_SUGGESTIONS_INDEX;
         protected string mapping = Constants.DEFAULT_MAPPING_TYPE;
 
-        public ESSuggestionsOutputManager()
+        public ESReadSuggestionsManager()
         {
             settings = new ConnectionSettings(new Uri(Constants.ELASTICSEARCH_URL))
                 .DefaultFieldNameInferrer(d => { return d.ToLower(); })

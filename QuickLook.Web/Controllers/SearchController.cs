@@ -37,7 +37,7 @@ namespace QuickLook.Web.Controllers
 
             SearchPagination pagination = CreatePagination(searchedContent);
 
-            ESOutputManager client = new ESOutputManager();
+            ESReadWebsitesManager client = new ESReadWebsitesManager();
             var searchResult = client
                 .FullTextSearchAdvanced(searchedContent, pagination)
                 .ToDto(pagination, searchedContent);
@@ -62,7 +62,7 @@ namespace QuickLook.Web.Controllers
 
             SearchPagination pagination = CreatePagination(take, page);
 
-            ESOutputManager client = new ESOutputManager();
+            ESReadWebsitesManager client = new ESReadWebsitesManager();
             var searchResult = client
                 .FullTextSearch(searchedContent, pagination)
                 .ToDto(pagination, searchedContentDto);

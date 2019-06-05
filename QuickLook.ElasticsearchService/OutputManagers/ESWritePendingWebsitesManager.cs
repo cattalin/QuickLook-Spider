@@ -10,13 +10,13 @@ using Shared.Models;
 
 namespace ElasticsearchService.OutputManagers
 {
-    public class ESPendingWebsitesInputManager : ESInputManager<PendingWebsite>
+    public class ESWritePendingWebsitesManager : ESWriteManager<PendingWebsite>
     {
         private ConnectionSettings settings;
         private ElasticClient client;
         private Random rr;
 
-        public ESPendingWebsitesInputManager()
+        public ESWritePendingWebsitesManager()
         : base()
         {
             rr = new Random();

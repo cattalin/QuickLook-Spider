@@ -11,7 +11,7 @@ using Shared.DTOs;
 
 namespace ElasticsearchService.OutputManagers
 {
-    public class ESOutputManager
+    public class ESReadWebsitesManager
     {
         private ConnectionSettings settings;
         private ElasticClient client;
@@ -19,7 +19,7 @@ namespace ElasticsearchService.OutputManagers
         private string index = Constants.VISITED_WEBSITES_INDEX;
         protected string mapping = Constants.DEFAULT_MAPPING_TYPE;
 
-        public ESOutputManager()
+        public ESReadWebsitesManager()
         {
             settings = new ConnectionSettings(new Uri(Constants.ELASTICSEARCH_URL))
                 .DefaultFieldNameInferrer(d => { return d.First().ToString().ToUpper() + d.Substring(1); })

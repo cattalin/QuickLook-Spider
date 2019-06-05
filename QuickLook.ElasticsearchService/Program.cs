@@ -11,7 +11,7 @@ namespace ElasticsearchService
             Console.WriteLine("WilcardSearch for a content: ");
             string searchedContent = Console.ReadLine();
 
-            ESOutputManager client = new ESOutputManager();
+            ESReadWebsitesManager client = new ESReadWebsitesManager();
             var results = client.WilcardSearch(searchedContent);
 
             if(results.Count == 0)

@@ -11,13 +11,13 @@ namespace Spider.Managers
 {
     public class CrawlManager
     {
-        private ESWebsitesInputManager crawledWebsites;
-        private ESPendingWebsitesInputManager pendingWebsites;
-        private ESSuggestionsInputManager suggestions;
+        private ESWriteWebsitesManager crawledWebsites;
+        private ESWritePendingWebsitesManager pendingWebsites;
+        private ESWriteSuggestionsManager suggestions;
 
         private List<Task> crawlTasks = new List<Task>();
 
-        public CrawlManager(ESWebsitesInputManager crawledWebsites, ESPendingWebsitesInputManager pendingWebsites)
+        public CrawlManager(ESWriteWebsitesManager crawledWebsites, ESWritePendingWebsitesManager pendingWebsites)
         {
             this.crawledWebsites = crawledWebsites;
             this.pendingWebsites = pendingWebsites;
@@ -157,7 +157,7 @@ namespace Spider.Managers
             }
         }
 
-        public void ParseQueue(List<string> urlList, ESWebsitesInputManager outputManager)
+        public void ParseQueue(List<string> urlList, ESWriteWebsitesManager outputManager)
         {
             int i = 0;
             while (i < urlList.Count)

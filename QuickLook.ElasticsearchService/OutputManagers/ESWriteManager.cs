@@ -8,7 +8,7 @@ using Shared.Interfaces;
 
 namespace ElasticsearchService.OutputManagers
 {
-    public class ESInputManager<T> : IOutputManager<T>, IDisposable 
+    public class ESWriteManager<T> : IOutputManager<T>, IDisposable 
     {
         private ConnectionConfiguration settings;
         protected ElasticLowLevelClient lowlevelClient;
@@ -16,7 +16,7 @@ namespace ElasticsearchService.OutputManagers
         protected string index = Constants.VISITED_WEBSITES_INDEX;
         protected string mapping = Constants.DEFAULT_MAPPING_TYPE;
 
-        public ESInputManager()
+        public ESWriteManager()
         {
             settings = new ConnectionConfiguration(new Uri(Constants.ELASTICSEARCH_URL))
                 .RequestTimeout(TimeSpan.FromMinutes(2));

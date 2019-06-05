@@ -11,9 +11,9 @@ using Shared.DTOs;
 
 namespace ElasticsearchService.OutputManagers
 {
-    public class ESSuggestionsInputManager : ESInputManager<WebsiteInfo>
+    public class ESWriteSuggestionsManager : ESWriteManager<WebsiteInfo>
     {
-        public ESSuggestionsInputManager()
+        public ESWriteSuggestionsManager()
         {
             index = "search-suggestions";
         }

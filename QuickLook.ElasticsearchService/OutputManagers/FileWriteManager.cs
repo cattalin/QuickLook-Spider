@@ -8,12 +8,12 @@ using Shared.Models;
 
 namespace ElasticsearchService.OutputManagers
 {
-    public class FileOutputManager : IOutputManager<WebsiteInfo>, IDisposable
+    public class FileWriteManager : IOutputManager<WebsiteInfo>, IDisposable
     {
         private readonly StreamWriter _streamWriter;
         private readonly JsonSerializer _serializer;
 
-        public FileOutputManager(string filePath)
+        public FileWriteManager(string filePath)
         {
             this._streamWriter = new StreamWriter(filePath, true); ;
             this._serializer = new JsonSerializer();

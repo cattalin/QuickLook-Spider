@@ -12,7 +12,7 @@ namespace Spider.Managers
     {
         public static Dictionary<string, bool> PendingWebsites { get; set; }
         public static Dictionary<string, bool> VisitedWebsites { get; set; }
-        public static ESOutputManager EsClient { get; private set; }
+        public static ESReadWebsitesManager EsClient { get; private set; }
 
         public static int visitedCount { get; private set; }
 
@@ -20,7 +20,7 @@ namespace Spider.Managers
         {
             PendingWebsites = new Dictionary<string, bool>();
             VisitedWebsites = new Dictionary<string, bool>();
-            EsClient = new ESOutputManager();
+            EsClient = new ESReadWebsitesManager();
         }
 
         public static string GetWebsiteIdIfAlreadyCrawled(string url)
