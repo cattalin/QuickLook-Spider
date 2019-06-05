@@ -105,12 +105,6 @@ namespace Spider.Managers
 
             });
 
-            //var relatedWebsitesUrls = _hrefs
-            //                 ?.Where(_href => _href.StartsWith("http"))
-            //                 ?.Select(_href => _href);
-            //return relatedWebsitesUrls?.ToList();
-
-
             Uri baseUrl = new Uri(url);
 
             List<string> relatedWebsitesUrls = new List<string>();

@@ -10,6 +10,7 @@ namespace QuickLook.RelationalDbService.Entities
     public class ApplicationDbContext : DbContext
     {
         public DbSet<User> Users { get; set; }
+        public DbSet<Bookmark> Bookmarks { get; set; }
 
         public ApplicationDbContext() { }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }

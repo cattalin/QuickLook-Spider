@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using Shared.DTOs;
 
-namespace Shared.DTOs
+namespace Shared.Mappers
 {
     public static class NestToDtoMapper
     {
@@ -36,8 +36,10 @@ namespace Shared.DTOs
             {
                 var newResult = new WebsiteInfoDto
                 {
+                    Id = hit.Source.Id,
                     Title = hit.Source.Title,
                     Url = hit.Source.Url,
+                    Language = hit.Source.Language,
                     DescriptionMeta = hit.Source.DescriptionMeta,
                     CreateDate = hit.Source.CreateDate,
                     Paragraphs = hit.Source.Paragraphs,
