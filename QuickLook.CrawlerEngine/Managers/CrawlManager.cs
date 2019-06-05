@@ -102,8 +102,8 @@ namespace Spider.Managers
                 await crawledWebsites.OutputEntryAsync(retrievedInfo, retrievedInfo.Id);
 
                 var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
-                //var pendingWebsites = Utils.ConvertUrlsToModelList(relatedWebsiteUrls);
-                //await this.pendingWebsites.BulkOutputAsync(pendingWebsites);
+                var pendingWebsites = Utils.ConvertUrlsToModelList(relatedWebsiteUrls);
+                await this.pendingWebsites.BulkOutputAsync(pendingWebsites);
 
                 //await suggestions.BulkOutputAsync(retrievedInfo);
 

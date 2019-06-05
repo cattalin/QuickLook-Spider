@@ -179,6 +179,16 @@ namespace Spider.Managers
                     return;
                 }
 
+                if(sanitizedReference.IndexOfAny(";".ToCharArray()) != -1)
+                {
+                    return;
+                }
+
+                if(sanitizedReference.Contains(".png") || sanitizedReference.Contains(".jpg") || sanitizedReference.Contains(".pdf") || sanitizedReference.Contains(".jpeg"))
+                {
+                    return;
+                }
+
                 if (sanitizedReference.StartsWith("http"))
                 {
                     relatedWebsitesUrls.Add(sanitizedReference);
@@ -201,7 +211,7 @@ namespace Spider.Managers
                 }
                 else
                 {
-
+                    relatedWebsitesUrls.Add(baseUrl.Scheme + "://" + baseUrl.Host  + "/" + sanitizedReference);
                 }
 
             });
