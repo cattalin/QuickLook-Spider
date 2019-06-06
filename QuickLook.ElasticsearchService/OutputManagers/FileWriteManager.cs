@@ -51,10 +51,6 @@ namespace ElasticsearchService.OutputManagers
 
             await Task.Run(() => _serializer.Serialize(_streamWriter, retrievedInfo));
         }
-        public Task BulkIndexAsync(List<PendingWebsite> items)
-        {
-            throw new NotImplementedException();
-        }
 
         public bool isDisposed = false;
 
@@ -66,6 +62,11 @@ namespace ElasticsearchService.OutputManagers
                 _streamWriter.Close();
                 this.Dispose();
             }
+        }
+
+        public Task BulkIndexAsync(List<WebsiteInfo> items)
+        {
+            throw new NotImplementedException();
         }
     }
 }

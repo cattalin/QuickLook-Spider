@@ -8,7 +8,7 @@ using Shared.Interfaces;
 
 namespace ElasticsearchService.OutputManagers
 {
-    public class ESWriteManager<T> : IOutputManager<T>, IDisposable 
+    public class ESWriteManager<T> : IOutputManager<T>, IDisposable
     {
         private ConnectionConfiguration settings;
         protected ElasticLowLevelClient lowlevelClient;
@@ -18,8 +18,7 @@ namespace ElasticsearchService.OutputManagers
 
         public ESWriteManager()
         {
-            settings = new ConnectionConfiguration(new Uri(Constants.ELASTICSEARCH_URL))
-                .RequestTimeout(TimeSpan.FromMinutes(2));
+            settings = new ConnectionConfiguration(new Uri(Constants.ELASTICSEARCH_URL)).RequestTimeout(TimeSpan.FromMinutes(2));
 
             lowlevelClient = new ElasticLowLevelClient(settings);
         }
@@ -48,22 +47,24 @@ namespace ElasticsearchService.OutputManagers
             var response = asyncIndexResponse.Body;
         }
 
-        public async Task BulkIndexAsync(List<PendingWebsite> items)
+        public async Task BulkIndexAsync(List<T> items)
         {
             var data = new List<object>();
 
-            items.ForEach(i =>
+            items.ForEach(item =>
             {
                 data.Add(new
                 {
                     index = new
                     {
                         _index = index,
-                        _id = i.Id,
                         _type = "_doc"
                     }
                 });
-                data.Add(i);
+                data.Add(new
+                {
+                    name = item
+                });
             });
 
             var indexResponse = await lowlevelClient.BulkAsync<StringResponse>(PostData.MultiJson(data));

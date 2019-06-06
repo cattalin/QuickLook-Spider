@@ -80,5 +80,27 @@ namespace ElasticsearchService.OutputManagers
 
             return searchResponse.Hits.Select(h => h.Source).ToList();
         }
+
+        public async Task BulkIndexAsync(List<PendingWebsite> items)
+        {
+            var data = new List<object>();
+
+            items.ForEach(i =>
+            {
+                data.Add(new
+                {
+                    index = new
+                    {
+                        _index = index,
+                        _id = i.Id,
+                        _type = "_doc"
+                    }
+                });
+                data.Add(i);
+            });
+
+            var indexResponse = await lowlevelClient.BulkAsync<StringResponse>(PostData.MultiJson(data));
+            var response = indexResponse.Body;
+        }
     }
 }

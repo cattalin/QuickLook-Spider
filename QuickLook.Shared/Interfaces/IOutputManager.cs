@@ -10,7 +10,7 @@ namespace Shared.Interfaces
     {
         void OutputEntry(T retrievedInfo);
         Task IndexEntryAsync(T retrievedInfo);
-        Task BulkIndexAsync(List<PendingWebsite> items);
+        Task BulkIndexAsync(List<T> items);
         Task UpdateEntryAsync(T retrievedInfo, string Id);
     }
 }

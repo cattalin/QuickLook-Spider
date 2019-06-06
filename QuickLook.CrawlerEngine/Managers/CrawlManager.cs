@@ -18,10 +18,11 @@ namespace Spider.Managers
 
         private List<Task> crawlTasks = new List<Task>();
 
-        public CrawlManager(ESWriteWebsitesManager crawledWebsites, ESWritePendingWebsitesManager pendingWebsites)
+        public CrawlManager(ESWriteWebsitesManager crawledWebsites, ESWritePendingWebsitesManager pendingWebsites, ESWriteSuggestionsManager suggestions)
         {
             this.crawledWebsites = crawledWebsites;
             this.pendingWebsites = pendingWebsites;
+            this.suggestions = suggestions;
         }
 
         public async Task StartCrawlingAsync(List<string> urlSeeds)
@@ -107,7 +108,8 @@ namespace Spider.Managers
                 var pendingWebsites = relatedWebsiteUrls.ToPendingWebsites();
                 await this.pendingWebsites.BulkIndexAsync(pendingWebsites);
 
-                //await suggestions.BulkOutputAsync(retrievedInfo);
+                var retrievedSuggestions = retrievedInfo.ExtractFromCrawledDataAsStrings();
+                await suggestions.BulkIndexAsync(retrievedSuggestions);
 
                 stopwatch.Stop();
 

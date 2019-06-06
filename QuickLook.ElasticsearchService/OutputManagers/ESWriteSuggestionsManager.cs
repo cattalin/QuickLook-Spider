@@ -12,11 +12,12 @@ using QuickLook.Shared.Models;
 
 namespace ElasticsearchService.OutputManagers
 {
-    public class ESWriteSuggestionsManager : ESWriteManager<SearchSuggestion>
+    public class ESWriteSuggestionsManager : ESWriteManager<string>
     {
         public ESWriteSuggestionsManager()
         {
-            index = "search-suggestions";
+            index = Constants.SEARCH_SUGGESTIONS_INDEX;
+            mapping = Constants.DEFAULT_MAPPING_TYPE;
         }
     }
 }

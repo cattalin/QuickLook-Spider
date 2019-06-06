@@ -14,7 +14,7 @@ namespace Shared
         public const string SEARCH_SUGGESTIONS_INDEX = "search_suggestions";
         public const string DEFAULT_MAPPING_TYPE = "_doc";
 
-        public const int BATCH_SIZE = 15;
+        public const int BATCH_SIZE = 1;
 
         public static Language[] Languages =
         {
