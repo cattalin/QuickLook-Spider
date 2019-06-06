@@ -9,8 +9,8 @@ namespace Shared.Interfaces
     public interface IOutputManager<T>
     {
         void OutputEntry(T retrievedInfo);
-        Task OutputEntryAsync(T retrievedInfo);
-        Task BulkOutputAsync(List<PendingWebsite> items);
+        Task IndexEntryAsync(T retrievedInfo);
+        Task BulkIndexAsync(List<PendingWebsite> items);
         Task UpdateEntryAsync(T retrievedInfo, string Id);
     }
 }

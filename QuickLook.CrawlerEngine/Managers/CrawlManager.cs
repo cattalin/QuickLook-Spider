@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ElasticsearchService.OutputManagers;
 using Shared;
+using QuickLook.Shared.Mappers;
 
 namespace Spider.Managers
 {
@@ -99,11 +100,12 @@ namespace Spider.Managers
 
                 var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(currentUrl, htmlDoc);
 
-                await crawledWebsites.OutputEntryAsync(retrievedInfo, retrievedInfo.Id);
+                await crawledWebsites.IndexEntryAsync(retrievedInfo, retrievedInfo.Id);
 
                 var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
-                var pendingWebsites = Utils.ConvertUrlsToModelList(relatedWebsiteUrls);
-                await this.pendingWebsites.BulkOutputAsync(pendingWebsites);
+
+                var pendingWebsites = relatedWebsiteUrls.ToPendingWebsites();
+                await this.pendingWebsites.BulkIndexAsync(pendingWebsites);
 
                 //await suggestions.BulkOutputAsync(retrievedInfo);
 
@@ -135,7 +137,7 @@ namespace Spider.Managers
 
                     var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(currentUrl, htmlDoc);
 
-                    await crawledWebsites.OutputEntryAsync(retrievedInfo);
+                    await crawledWebsites.IndexEntryAsync(retrievedInfo);
 
                     var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
 
@@ -146,7 +148,7 @@ namespace Spider.Managers
 
                     foreach (var relatedWebsiteUrl in relatedWebsiteUrls)
                     {
-                        Task.Run(() => ParseWebsiteRecursivelyAsync(relatedWebsiteUrl));
+                        //Task.Run(() => ParseWebsiteRecursivelyAsync(relatedWebsiteUrl));
                     }
 
                 }
@@ -214,8 +216,8 @@ namespace Spider.Managers
 
                         var relatedWebsiteUrls = Utils.RetrieveRelatedWebsitesUrls(url, htmlDoc);
 
-                        if (relatedWebsiteUrls != null && relatedWebsiteUrls.Count() > 0)
-                            ParseRecursively(relatedWebsiteUrls);
+                        //if (relatedWebsiteUrls != null && relatedWebsiteUrls.Count() > 0)
+                        //    ParseRecursively(relatedWebsiteUrls);
                     }
                     else Console.WriteLine("Website --> ALREADY VISITED -->" + url);
                 }

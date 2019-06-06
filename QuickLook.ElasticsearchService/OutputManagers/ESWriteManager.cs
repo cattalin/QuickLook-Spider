@@ -30,13 +30,13 @@ namespace ElasticsearchService.OutputManagers
             var response = indexResponse.Body;
         }
 
-        public async Task OutputEntryAsync(T retrievedInfo)
+        public async Task IndexEntryAsync(T retrievedInfo)
         {
             var asyncIndexResponse = await lowlevelClient.IndexAsync<StringResponse>(index, mapping, PostData.Serializable(retrievedInfo));
             var response = asyncIndexResponse.Body;
         }
 
-        public async Task OutputEntryAsync(T retrievedInfo, string Id)
+        public async Task IndexEntryAsync(T retrievedInfo, string Id)
         {
             var asyncIndexResponse = await lowlevelClient.IndexAsync<StringResponse>(index, mapping, Id, PostData.Serializable(retrievedInfo));
             var response = asyncIndexResponse.Body;
@@ -48,7 +48,7 @@ namespace ElasticsearchService.OutputManagers
             var response = asyncIndexResponse.Body;
         }
 
-        public async Task BulkOutputAsync(List<PendingWebsite> items)
+        public async Task BulkIndexAsync(List<PendingWebsite> items)
         {
             var data = new List<object>();
 

@@ -30,7 +30,7 @@ namespace ElasticsearchService.OutputManagers
             _serializer.Serialize(_streamWriter, retrievedInfo);
         }
 
-        public async Task OutputEntryAsync(WebsiteInfo retrievedInfo)
+        public async Task IndexEntryAsync(WebsiteInfo retrievedInfo)
         {
 
             Console.WriteLine("Website --> " + retrievedInfo.Url);
@@ -51,7 +51,7 @@ namespace ElasticsearchService.OutputManagers
 
             await Task.Run(() => _serializer.Serialize(_streamWriter, retrievedInfo));
         }
-        public Task BulkOutputAsync(List<PendingWebsite> items)
+        public Task BulkIndexAsync(List<PendingWebsite> items)
         {
             throw new NotImplementedException();
         }
