@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ElasticsearchService.OutputManagers;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Shared.DTOs;
 
 namespace QuickLook.WebApi.Controllers
 {
@@ -30,14 +28,14 @@ namespace QuickLook.WebApi.Controllers
             var searchResult = client
                 .CompletionSuggesterSearch(searchedContent);
 
-            var results = searchResult.Suggest.FirstOrDefault().Value.FirstOrDefault().Options?.Select(s => new { Suggestion = s.Text });
+            var results = searchResult.Suggest?.FirstOrDefault().Value?.FirstOrDefault()?.Options?.Select(s => new { Suggestion = s.Text });
             return Ok(results);
         }
 
         [HttpPost]
         public IActionResult AddSuggestion(string content)
         {
-            ESReadWebsitesManager client = new ESReadWebsitesManager();
+            ESWriteSuggestionsManager client = new ESWriteSuggestionsManager();
             
             return Ok();
         }

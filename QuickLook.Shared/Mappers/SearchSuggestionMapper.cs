@@ -15,14 +15,14 @@ namespace QuickLook.Shared.Mappers
 
             suggestions.Add(new SearchSuggestion
             {
-                Name = websiteInfo.Title
+                Text = websiteInfo.Title
             });
 
             websiteInfo.Headers.ForEach(header =>
             {
                 suggestions.Add(new SearchSuggestion
                 {
-                    Name = String.Concat(header.Take(60))
+                    Text = header.Take(30).ToArray().ToString()
                 });
             });
 
