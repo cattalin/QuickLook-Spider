@@ -29,7 +29,7 @@ namespace Spider
 
             CrawlManager crawlManager = new CrawlManager(crawledWebsites, pendingWebsites, suggestions);
             
-            crawlManager.StartCrawlingAsync(urlList);
+            crawlManager.StartCrawlingAsync();
 
             Console.ReadLine();
         }

@@ -7,6 +7,7 @@ using ElasticsearchService.OutputManagers;
 using Shared.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Models;
+using Shared.Mappers;
 
 namespace QuickLook.Web.Controllers
 {

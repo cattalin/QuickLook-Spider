@@ -112,7 +112,6 @@ namespace Spider.Managers
 
             var _paragraphs = _page.SelectNodes("//p");
             var paragraphs = _paragraphs?.Select(p => SanitizeIrrelevantContent(WebUtility.HtmlDecode(p.InnerText)));
-            //paragraphs.ToList().ForEach(p => SanitizeIrrelevantContent(p));
 
             var fullPage = _page.InnerText;
 
@@ -157,21 +156,17 @@ namespace Spider.Managers
                     .Select(attr => attr.Name)
                     ?.ToList()
                     .IndexOf("href")??-1;
-                if (hrefAttributeIndex != -1)
-                {
+                if (hrefAttributeIndex != -1) 
                     return r.Attributes[hrefAttributeIndex].Value;
-                }
-
                 return null;
             });
 
-
             Uri baseUrl = new Uri(url);
-
             List<string> relatedWebsitesUrls = new List<string>();
 
             _hrefs?.ToList().ForEach(_href =>
             {
+                #region Sanitizing
                 var sanitizedReference = _href.Split('#').First();
 
                 if (sanitizedReference.Equals(sanitizedUrl))
@@ -188,6 +183,7 @@ namespace Spider.Managers
                 {
                     return;
                 }
+                #endregion
 
                 if (sanitizedReference.StartsWith("http"))
                 {
@@ -201,11 +197,11 @@ namespace Spider.Managers
                 {
                     relatedWebsitesUrls.Add(baseUrl.Scheme + "://" + baseUrl.Host + sanitizedReference);
                 }
-                else if (sanitizedReference.StartsWith("./"))
+                else if (sanitizedReference.StartsWith("#"))
                 {
 
                 }
-                else if (sanitizedReference.StartsWith("#"))
+                else if (sanitizedReference.StartsWith("./"))
                 {
 
                 }

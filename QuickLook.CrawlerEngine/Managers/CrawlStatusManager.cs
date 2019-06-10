@@ -61,7 +61,7 @@ namespace Spider.Managers
 
         public static IEnumerable<string> TakeNextBatch()
         {
-            return new List<string>(PendingWebsites.Keys.Take(Constants.BATCH_SIZE));
+            return new List<string>(PendingWebsites.Keys.Take(Constants.MAX_THREADS));
         }
 
         public static void AddPendingWebsite(string url)

@@ -25,22 +25,26 @@ namespace Spider.Managers
             this.suggestions = suggestions;
         }
 
-        public async Task StartCrawlingAsync(List<string> urlSeeds)
+        public void StartCrawlingAsync()
         {
-            await StartCrawlThreadsAsync();
-            //            await PeriodicCrawlAsync(new TimeSpan(0, 0, 1), new CancellationToken(false));
+            StartCrawlThreadsAsync();
         }
 
-        public async Task PeriodicCrawlAsync(TimeSpan interval, CancellationToken cancellationToken)
+        public async Task StartCrawlingAsyncOld(List<string> urlSeeds)
+        {
+            await PeriodicCrawlAsyncOld(new TimeSpan(0, 0, 1), new CancellationToken(false));
+        }
+
+        public async Task PeriodicCrawlAsyncOld(TimeSpan interval, CancellationToken cancellationToken)
         {
             while (true)
             {
-                await CrawlBatch();
+                await CrawlBatchOld();
                 //                await Task.Delay(interval, cancellationToken);
             }
         }
 
-        public async Task CrawlBatch()
+        public async Task CrawlBatchOld()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             Console.WriteLine("STARTED_BATCH");
@@ -52,9 +56,9 @@ namespace Spider.Managers
             //            });
 
             List<Task> tasks = new List<Task>();
-            pendingWebsites.GetNextPendingBatchRandomNest(Constants.BATCH_SIZE).ForEach(async pendingWeb =>
+            pendingWebsites.GetNextPendingBatchRandomNest(Constants.MAX_THREADS).ForEach(async pendingWeb =>
             {
-                tasks.Add(ParseWebsiteAsync(pendingWeb.Url));
+                //tasks.Add(ParseWebsiteAsync(pendingWeb.Url));
             });
 
 
@@ -63,22 +67,20 @@ namespace Spider.Managers
             Console.WriteLine($"ENDED_BATCH({stopwatch.ElapsedMilliseconds})");
         }
 
-        public async Task StartCrawlThreadsAsync()
+        public void StartCrawlThreadsAsync()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             Console.WriteLine("STARTED_BATCH");
 
-            for (var i = 0; i < Constants.BATCH_SIZE; i++)
+            for (var i = 0; i < Constants.MAX_THREADS; i++)
             {
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 Task.Run(async () =>
                 {
                     while (true)
                     {
                         try
                         {
-                            var pendingWebsite = pendingWebsites.GetNextPendingBatchRandomNest(1).First();
-                            await ParseWebsiteAsync(pendingWebsite.Url);
+                            await ParseWebsiteAsync();
                         }
                         catch (Exception Ex)
                         {
@@ -91,22 +93,24 @@ namespace Spider.Managers
             Console.WriteLine($"ENDED_BATCH({stopwatch.ElapsedMilliseconds})");
         }
 
-        public async Task ParseWebsiteAsync(string currentUrl)
+        public async Task ParseWebsiteAsync()
         {
+            var currentUrl = "";
+
             try
             {
                 Stopwatch stopwatch = Stopwatch.StartNew();
 
+                var pendingWebsite = this.pendingWebsites.GetNextPendingBatchRandomNest(1).First();
+                currentUrl = pendingWebsite.Url;
+
                 var htmlDoc = await UtilsAsync.LoadWebsiteAsync(currentUrl);
-
                 var retrievedInfo = await UtilsAsync.RetrieveWebsiteInfoAsync(currentUrl, htmlDoc);
-
                 await crawledWebsites.IndexEntryAsync(retrievedInfo, retrievedInfo.Id);
 
                 var relatedWebsiteUrls = await UtilsAsync.RetrieveRelatedWebsitesUrlsAsync(currentUrl, htmlDoc);
-
-                var pendingWebsites = relatedWebsiteUrls.ToPendingWebsites();
-                await this.pendingWebsites.BulkIndexAsync(pendingWebsites);
+                var relatedUrls = relatedWebsiteUrls.ToPendingWebsites();
+                await this.pendingWebsites.BulkIndexAsync(relatedUrls);
 
                 var retrievedSuggestions = retrievedInfo.ExtractFromCrawledDataAsStrings();
                 await suggestions.BulkIndexAsync(retrievedSuggestions);
