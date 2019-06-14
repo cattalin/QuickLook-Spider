@@ -52,13 +52,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="OutputManagers\ESWritePendingWebsitesManager.cs" />
-    <Compile Include="OutputManagers\ESWriteManager.cs" />
-    <Compile Include="OutputManagers\ESWriteSuggestionsManager.cs" />
-    <Compile Include="OutputManagers\ESReadSuggestionsManager.cs" />
-    <Compile Include="OutputManagers\ESWriteWebsitesManager.cs" />
-    <Compile Include="OutputManagers\FileWriteManager.cs" />
-    <Compile Include="OutputManagers\ESReadWebsitesManager.cs" />
+    <Compile Include="Managers\ESWritePendingWebsitesManager.cs" />
+    <Compile Include="Managers\ESWriteManager.cs" />
+    <Compile Include="Managers\ESWriteSuggestionsManager.cs" />
+    <Compile Include="Managers\ESReadSuggestionsManager.cs" />
+    <Compile Include="Managers\ESWriteWebsitesManager.cs" />
+    <Compile Include="Managers\FileWriteManager.cs" />
+    <Compile Include="Managers\ESReadWebsitesManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -3,11 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Elasticsearch.Net;
 using Shared;
-using Shared.Models;
-using Shared.DTOs;
 using QuickLook.Shared.Models;
 
 namespace ElasticsearchService.OutputManagers
@@ -19,6 +15,7 @@ namespace ElasticsearchService.OutputManagers
 
         private string index = Constants.SEARCH_SUGGESTIONS_INDEX;
         protected string mapping = Constants.DEFAULT_MAPPING_TYPE;
+        private readonly int SIZE = 10;
 
         public ESReadSuggestionsManager()
         {
@@ -58,7 +55,7 @@ namespace ElasticsearchService.OutputManagers
             var searchResult = client.Search<SearchSuggestion>(s => s
                 .Index(Constants.SEARCH_SUGGESTIONS_INDEX)
                 .Type(mapping)
-                .Size(10)
+                .Size(SIZE)
                 .Query(q => q
                     .Prefix(p => p
                         .Field("name.keywordstring")
@@ -75,7 +72,7 @@ namespace ElasticsearchService.OutputManagers
             var searchResult = client.Search<SearchSuggestion>(s => s
                 .Index(Constants.SEARCH_SUGGESTIONS_INDEX)
                 .Type(mapping)
-                .Size(10)
+                .Size(SIZE)
                 .Query(q => q
                     .Match(p => p
                         .Field("name.edgengram")
@@ -92,13 +89,13 @@ namespace ElasticsearchService.OutputManagers
             var searchResult = client.Search<SearchSuggestion>(s => s
                 .Index(Constants.SEARCH_SUGGESTIONS_INDEX)
                 .Type(mapping)
-                .Size(10)
+                .Size(SIZE)
                 .Suggest(q => q
                     .Completion("search-suggest-fuzzy", c => c
                         .Fuzzy(f => f
                             .Fuzziness(Fuzziness.EditDistance(1))
                         )
-                        .Prefix(searchContent)
+                        .Prefix(searchContent)  
                         .Field("name.completion")
                         .SkipDuplicates(true)
                     )

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace QuickLook.Shared.Mappers
 {
@@ -39,7 +40,18 @@ namespace QuickLook.Shared.Mappers
                 suggestions.Add(String.Concat(header.Take(60)));
             });
 
-            return suggestions;
+            var sanitizedSugestions = suggestions
+                .Select(s => SanitizeSuggestion(s))
+                .Where(s => s != "").ToList();
+
+            return sanitizedSugestions;
+        }
+
+        public static string SanitizeSuggestion(string text)
+        {
+            var sanitizedText = text.Replace("[Edit]", "");
+            Regex reg = new Regex("[^a-zA-Z' -,.&$]");
+            return reg.Replace(sanitizedText, string.Empty);
         }
     }
 }
