@@ -58,6 +58,11 @@ namespace ElasticsearchService.OutputManagers
                 return FullTextSearchPendingWebsites(searchContent, pagination);
             }
 
+            if (searchContent.MatchExactSentence)
+            {
+                return FullTextSearchMatchSentence(searchContent, pagination);
+            }
+
             var searchResult = client.Search<WebsiteInfo>(s => s
                     .Index(Constants.VISITED_WEBSITES_INDEX)
                     .Type(mapping)
@@ -66,10 +71,13 @@ namespace ElasticsearchService.OutputManagers
                     .Query(q => q
                         .Bool(b => b
                             .Must(
-                                m => m.MultiMatch(w => w
-                                    .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs").Field("FullPageContent"))
+                                m =>
+                                m.MultiMatch(w => w
+                                    .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta")
+                                        .Field("Paragraphs").Field("FullPageContent"))
                                     .Query(searchContent.Input)
-                                    .Fuzziness(Fuzziness.EditDistance(searchContent.Fuzziness))),
+                                    .Fuzziness(Fuzziness.EditDistance(searchContent.Fuzziness))
+                                ),
                                 m => m.Term(t => t.Language, searchContent.Language),
                                 m => m.DateRange(t => t
                                     .Field(f => f.CreateDate)
@@ -79,9 +87,39 @@ namespace ElasticsearchService.OutputManagers
                             )
                         )
                     .Highlight(h => h.PreTags("<b>").PostTags("</b>")
-                        .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta").Field("Paragraphs").Field("FullPageContent"))
+                        .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta")
+                            .Field("Paragraphs").Field("FullPageContent"))
                     )
                 );
+
+            return searchResult;
+        }
+
+        public ISearchResponse<WebsiteInfo> FullTextSearchMatchSentence(SearchContentDTO searchContent, SearchPagination pagination)
+        {
+
+            var searchResult = client.Search<WebsiteInfo>(s => s
+                    .Index(Constants.VISITED_WEBSITES_INDEX)
+                    .Type(mapping)
+                    .From(pagination.From)
+                    .Size(pagination.Take)
+                    .Query(q => q
+                        .Bool(b => b
+                            .Must(
+                                m => m.MatchPhrase(w => w
+                                    .Field(p => p.FullPageContent)
+                                    .Query(searchContent.Input)
+                                ),
+                                m => m.Term(t => t.Language, searchContent.Language)
+                            )
+                        )
+                    )
+                    .Highlight(h => h.PreTags("<b>").PostTags("</b>")
+                        .Fields(f => f.Field("Url").Field("Title").Field("DescriptionMeta")
+                            .Field("Paragraphs").Field("FullPageContent"))
+                    )
+                );
+
             return searchResult;
         }
 
@@ -126,7 +164,7 @@ namespace ElasticsearchService.OutputManagers
                                 .Fuzziness(Fuzziness.EditDistance(2)))
                             , m => m.Term(t => t.Language, "en")
                             )
-                        //.Should(m => m.Term(t => t.Language, "en"))
+                    //.Should(m => m.Term(t => t.Language, "en"))
                     )
                 )
                 .Highlight(h => h

@@ -111,7 +111,8 @@ namespace Spider.Managers
             var _page = htmlDoc.DocumentNode.SelectSingleNode("//body");
 
             var _paragraphs = _page.SelectNodes("//p");
-            var paragraphs = _paragraphs?.Select(p => SanitizeIrrelevantContent(WebUtility.HtmlDecode(p.InnerText)));
+            var paragraphs = _paragraphs?.Select(p => SanitizeIrrelevantContent(WebUtility.HtmlDecode(p.InnerText)))
+                .Where(p => p != "").ToList();
 
             var fullPage = _page.InnerText;
 
@@ -155,8 +156,8 @@ namespace Spider.Managers
                 int hrefAttributeIndex = r.Attributes
                     .Select(attr => attr.Name)
                     ?.ToList()
-                    .IndexOf("href")??-1;
-                if (hrefAttributeIndex != -1) 
+                    .IndexOf("href") ?? -1;
+                if (hrefAttributeIndex != -1)
                     return r.Attributes[hrefAttributeIndex].Value;
                 return null;
             });
@@ -174,12 +175,12 @@ namespace Spider.Managers
                     return;
                 }
 
-                if(sanitizedReference.IndexOfAny(";".ToCharArray()) != -1)
+                if (sanitizedReference.IndexOfAny(";".ToCharArray()) != -1)
                 {
                     return;
                 }
 
-                if(sanitizedReference.Contains(".png") || sanitizedReference.Contains(".jpg") || sanitizedReference.Contains(".pdf") || sanitizedReference.Contains(".jpeg"))
+                if (sanitizedReference.Contains(".png") || sanitizedReference.Contains(".jpg") || sanitizedReference.Contains(".pdf") || sanitizedReference.Contains(".jpeg"))
                 {
                     return;
                 }
@@ -207,7 +208,7 @@ namespace Spider.Managers
                 }
                 else
                 {
-                    relatedWebsitesUrls.Add(baseUrl.Scheme + "://" + baseUrl.Host  + "/" + sanitizedReference);
+                    relatedWebsitesUrls.Add(baseUrl.Scheme + "://" + baseUrl.Host + "/" + sanitizedReference);
                 }
 
             });

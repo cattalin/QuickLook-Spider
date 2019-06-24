@@ -10,11 +10,11 @@ namespace Shared
     {
         public const string ELASTICSEARCH_URL = "http://localhost:9200";
         public const string VISITED_WEBSITES_INDEX = "websites";
-        public const string PENDING_WEBSITES_INDEX = "pending_websites_new";
+        public const string PENDING_WEBSITES_INDEX = "pending_websites";
         public const string SEARCH_SUGGESTIONS_INDEX = "search_suggestions";
         public const string DEFAULT_MAPPING_TYPE = "_doc";
 
-        public const int MAX_THREADS = 10;
+        public const int MAX_THREADS = 15;
 
         public static Language[] Languages =
         {

@@ -14,7 +14,7 @@ namespace Shared.DTOs
 
         public bool IsAdvancedSearch { get; set; }
         public bool MatchExactWords { get; set; }
-        public bool MatchExactContent { get; set; }
+        public bool MatchExactSentence { get; set; }
         public bool MatchUncrawledWebsites { get; set; }
 
         public DateTime StartDate { get; set; }
@@ -39,7 +39,7 @@ namespace Shared.DTOs
 
             this.IsAdvancedSearch = other.IsAdvancedSearch;
             this.MatchExactWords = other.MatchExactWords;
-            this.MatchExactContent = other.MatchExactContent;
+            this.MatchExactSentence = other.MatchExactSentence;
             this.MatchUncrawledWebsites = other.MatchUncrawledWebsites;
 
             this.Fuzziness = other.Fuzziness;

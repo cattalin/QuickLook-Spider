@@ -29,13 +29,14 @@ namespace QuickLook.Shared.Mappers
 
             return suggestions;
         }
+
         public static List<string> ExtractFromCrawledDataAsStrings(this WebsiteInfo websiteInfo)
         {
             var suggestions = new List<string>();
 
             suggestions.Add(websiteInfo.Title);
 
-            websiteInfo.Headers.ForEach(header =>
+            websiteInfo.Headers?.ForEach(header =>
             {
                 suggestions.Add(String.Concat(header.Take(60)));
             });
@@ -49,9 +50,11 @@ namespace QuickLook.Shared.Mappers
 
         public static string SanitizeSuggestion(string text)
         {
-            var sanitizedText = text.Replace("[Edit]", "");
-            Regex reg = new Regex("[^a-zA-Z' -,.&$]");
-            return reg.Replace(sanitizedText, string.Empty);
+            var step1SanitizationText = text.Replace("[Edit]", "");
+            Regex reg = new Regex("[^a-zA-Z0-9' -,.&$]");                           //remove strange characters
+            var sanitizedText = reg.Replace(step1SanitizationText, string.Empty);
+
+            return Regex.Replace(sanitizedText, @"\s+", " ");                    //remove newlines tabs and whitespaces
         }
     }
 }
