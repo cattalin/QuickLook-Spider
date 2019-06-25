@@ -97,7 +97,6 @@ namespace ElasticsearchService.OutputManagers
 
         public ISearchResponse<WebsiteInfo> FullTextSearchMatchSentence(SearchContentDTO searchContent, SearchPagination pagination)
         {
-
             var searchResult = client.Search<WebsiteInfo>(s => s
                     .Index(Constants.VISITED_WEBSITES_INDEX)
                     .Type(mapping)

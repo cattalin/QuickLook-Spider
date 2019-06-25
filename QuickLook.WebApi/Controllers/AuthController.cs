@@ -103,7 +103,29 @@ namespace QuickLook.WebApi.Controllers
 
             context.SaveChanges();
 
-            return Ok(new { Status = "Successfully created" });
+            var basicUserClaims = new List<Claim>()
+                {
+                    new Claim("UserId", entity.Id)
+                };
+
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                _config["Jwt:Issuer"],
+                _config["Jwt:Issuer"],
+                claims: basicUserClaims,
+                expires: DateTime.Now.AddDays(5),
+                signingCredentials: signinCredentials
+            );
+
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return Ok(new
+            {
+                Status = "Successfully registered",
+                Token = tokenString,
+            });
         }
 
         // derive a 256-bit subkey (use HMACSHA1 with 10,000 iterations)
